@@ -9,8 +9,6 @@ class UserRepository:
     def __init__(self) -> None:
         self.users: Dict[str, dict] = self._load_users() # 알고있던 user 정보 불러오기
 
-class UserRepository:
-
     def _load_users(self) -> Dict[str, Dict]: # users.json 파일을 dict 형태로 불러오기 
         try:
             with open(USER_DATA, "r") as f:
