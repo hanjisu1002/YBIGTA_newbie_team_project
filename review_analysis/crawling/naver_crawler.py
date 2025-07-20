@@ -51,6 +51,7 @@ class NaverCrawler(BaseCrawler):
                 time.sleep(1.5)
 
             # 별점과 리뷰 텍스트 추출
+
             stars = self.driver.find_elements(By.CLASS_NAME, "_15NU42F3kT")[4:]
             spans = self.driver.find_elements(By.CLASS_NAME, "_2L3vDiadT9")
 
@@ -72,7 +73,6 @@ class NaverCrawler(BaseCrawler):
                 end = date_indices[idx + 1] if idx + 1 < len(date_indices) else len(spans_text)
                 groups.append(spans_text[start:end])
 
-
             # 한 페이지 당 20개 크롤링
             for i in range(0,19):
                 try:
@@ -87,12 +87,14 @@ class NaverCrawler(BaseCrawler):
                     # 500개 모았으면 종료
                     if len(self.reviews) >= 500:
                         break
+
             # 20번째
-            self.reviews.append([groups[19][0], stars[19].text, [groups[19][-1]]])
+            self.reviews.append([groups[19][0], stars[19].text, [groups[19][-1]]]
             
 
             # 다음 페이지로 이동
             try:
+
                 if current_page%10 > 0 :
                     next_button = self.driver.find_element(By.XPATH, f'//a[text()="{current_page + 1}"]')
                     self.driver.execute_script("arguments[0].click();", next_button)
@@ -121,3 +123,4 @@ class NaverCrawler(BaseCrawler):
             writer.writerows(self.reviews)
 
         print(f"✅ {len(self.reviews)}개 리뷰 저장 완료: {output_path}")
+
