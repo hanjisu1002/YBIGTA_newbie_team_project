@@ -113,7 +113,7 @@ class NaverCrawler(BaseCrawler):
 
     def save_to_database(self):
         os.makedirs(self.output_dir, exist_ok=True)
-        output_path = os.path.join(self.output_dir, "naver_reviews.csv")
+        output_path = os.path.join(self.output_dir, "reviews_naver.csv")
 
         with open(output_path, "w", newline="", encoding="utf-8-sig") as f:
             writer = csv.writer(f)
