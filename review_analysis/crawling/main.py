@@ -1,58 +1,39 @@
-import os
-import time
-import pandas as pd
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
+from argparse import ArgumentParser
+from typing import Dict, Type
+from base_crawler import BaseCrawler
+from LotteOn_crawler import LotteOnCrawler  # ← 필요한 크롤러만 불러와
 
-class LotteOnCrawler:
-    def __init__(self, output_dir: str):
-        self.base_url = "https://www.lotteon.com/p/product/LM4101102508"  # 코카콜라 190ml 60캔
-        self.output_dir = output_dir
+# 사용할 크롤러를 등록
+CRAWLER_CLASSES: Dict[str, Type[BaseCrawler]] = {
+    "lotteon": LotteOnCrawler,
+}
 
-    def start_browser(self):
-        options = Options()
-        options.add_experimental_option("detach", True)
-        options.add_experimental_option("excludeSwitches", ["enable-logging"])
-        self.driver = webdriver.Chrome(options=options)
-        self.driver.set_window_size(1920, 1080)
-        self.driver.get(self.base_url)
-        time.sleep(3)
+def create_parser() -> ArgumentParser:
+    parser = ArgumentParser()
+    parser.add_argument('-o', '--output_dir', type=str, required=True, help="Output file directory. Example: ../../database")
+    parser.add_argument('-c', '--crawler', type=str, required=False, choices=CRAWLER_CLASSES.keys(),
+                        help=f"Which crawler to use. Choices: {', '.join(CRAWLER_CLASSES.keys())}")
+    parser.add_argument('-a', '--all', action='store_true', help="Run all crawlers. Default to False.")
+    return parser
 
-    def scrape_reviews(self, max_pages=20):
-        values = []
-        for _ in range(max_pages):
-            time.sleep(2)
-            soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-            rows = soup.select('div.review_list_wrap ul li')
+if __name__ == "__main__":
+    parser = create_parser()
+    args = parser.parse_args()
 
-            for row in rows:
-                date_tag = row.select_one('span.date')
-                star_tag = row.select_one('div.staring em')
-                review_tag = row.select_one('button.texts span.texting')
+    if args.all:
+        for crawler_name in CRAWLER_CLASSES.keys():
+            CrawlerClass = CRAWLER_CLASSES[crawler_name]
+            crawler = CrawlerClass(args.output_dir)
+            crawler.start_browser()
+            crawler.scrape_reviews()
+            crawler.save_to_database()
 
-                if not (date_tag and star_tag and review_tag):
-                    continue
+    elif args.crawler:
+        CrawlerClass = CRAWLER_CLASSES[args.crawler]
+        crawler = CrawlerClass(args.output_dir)
+        crawler.start_browser()
+        crawler.scrape_reviews()
+        crawler.save_to_database()
 
-                date = date_tag.text.strip()
-                star = float(star_tag.text.strip())
-                review = review_tag.get_text(separator=' ', strip=True)
-                values.append([date, star, review])
-
-            try:
-                next_btn = self.driver.find_element(By.CSS_SELECTOR, 'a[class*="next"]')
-                if 'disabled' in next_btn.get_attribute('class'):
-                    break
-                next_btn.click()
-            except Exception as e:
-                print("다음 버튼 클릭 실패 또는 마지막 페이지:", e)
-                break
-
-        self.reviews = values
-
-    def save_to_database(self):
-        df = pd.DataFrame(self.reviews, columns=['date', 'star_rate', 'review'])
-        os.makedirs(self.output_dir, exist_ok=True)
-        output_path = os.path.join(self.output_dir, 'reviews_lotteon.csv')
-        df.to_csv(output_path, index=False, encoding='utf-8-sig')
+    else:
+        raise ValueError("No crawler specified. Use --crawler or --all.")
