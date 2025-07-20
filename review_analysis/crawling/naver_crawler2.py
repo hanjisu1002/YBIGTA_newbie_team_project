@@ -97,10 +97,16 @@ class NaverCrawler(BaseCrawler):
 
             # 다음 페이지로 이동
             try:
-                next_button = self.driver.find_element(By.XPATH, '//a[text()="다음"]')
-                self.driver.execute_script("arguments[0].click();", next_button)
-                current_page += 1
-                time.sleep(3)
+                if current_page%10 > 0 :
+                    next_button = self.driver.find_element(By.XPATH, f'//a[text()="{(current_page%10) + 1}"]')
+                    self.driver.execute_script("arguments[0].click();", next_button)
+                    current_page += 1
+                    time.sleep(3)
+                else :
+                    next_button = self.driver.find_element(By.XPATH, '//a[text()="다음"]')
+                    self.driver.execute_script("arguments[0].click();", next_button)
+                    current_page += 1
+                    time.sleep(3)
             except Exception as e:
                 print("✅ 마지막 페이지거나 '다음' 버튼 없음:", e)
                 break
