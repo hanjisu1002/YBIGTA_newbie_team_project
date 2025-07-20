@@ -51,7 +51,8 @@ class NaverCrawler(BaseCrawler):
                 time.sleep(1.5)
 
             # 별점과 리뷰 텍스트 추출
-            stars = self.driver.find_elements(By.CLASS_NAME, "_15NU42F3kT")[4:-1]
+
+            stars = self.driver.find_elements(By.CLASS_NAME, "_15NU42F3kT")[4:]
             spans = self.driver.find_elements(By.CLASS_NAME, "_2L3vDiadT9")
 
             spans_text = [s.text.strip() for s in spans]  # WebElement에서 텍스트 추출
@@ -72,12 +73,7 @@ class NaverCrawler(BaseCrawler):
                 end = date_indices[idx + 1] if idx + 1 < len(date_indices) else len(spans_text)
                 groups.append(spans_text[start:end])
 
-
-            # 결과 확인
-            for g in groups:
-                print("🧩", g)
-
-
+            # 한 페이지 당 20개 크롤링
             for i in range(0,19):
                 try:
                     star = stars[i].text
@@ -92,14 +88,23 @@ class NaverCrawler(BaseCrawler):
                     if len(self.reviews) >= 500:
                         break
 
+            # 20번째
+            self.reviews.append([groups[19][0], stars[19].text, [groups[19][-1]]]
             
 
             # 다음 페이지로 이동
             try:
-                next_button = self.driver.find_element(By.XPATH, '//a[text()="다음"]')
-                self.driver.execute_script("arguments[0].click();", next_button)
-                current_page += 1
-                time.sleep(3)
+
+                if current_page%10 > 0 :
+                    next_button = self.driver.find_element(By.XPATH, f'//a[text()="{current_page + 1}"]')
+                    self.driver.execute_script("arguments[0].click();", next_button)
+                    current_page += 1
+                    time.sleep(3)
+                else :
+                    next_button = self.driver.find_element(By.XPATH, '//a[text()="다음"]')
+                    self.driver.execute_script("arguments[0].click();", next_button)
+                    current_page += 1
+                    time.sleep(3)
             except Exception as e:
                 print("✅ 마지막 페이지거나 '다음' 버튼 없음:", e)
                 break
@@ -110,7 +115,7 @@ class NaverCrawler(BaseCrawler):
 
     def save_to_database(self):
         os.makedirs(self.output_dir, exist_ok=True)
-        output_path = os.path.join(self.output_dir, "naver_reviews.csv")
+        output_path = os.path.join(self.output_dir, "reviews_naver.csv")
 
         with open(output_path, "w", newline="", encoding="utf-8-sig") as f:
             writer = csv.writer(f)
@@ -118,3 +123,4 @@ class NaverCrawler(BaseCrawler):
             writer.writerows(self.reviews)
 
         print(f"✅ {len(self.reviews)}개 리뷰 저장 완료: {output_path}")
+
