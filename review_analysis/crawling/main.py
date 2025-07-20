@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from typing import Dict, Type
 from review_analysis.crawling.base_crawler import BaseCrawler
 from review_analysis.crawling.naver_crawler import NaverCrawler
-from review_analysis.crawling.emart_crawler import EmartCrawler
+from review_analysis.crawling.emart_crawler import EmartCrawler 
 from review_analysis.crawling.LotteOn_crawler import LotteOnCrawler
 
 
