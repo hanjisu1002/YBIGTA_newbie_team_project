@@ -1,39 +1,44 @@
 from argparse import ArgumentParser
 from typing import Dict, Type
-from base_crawler import BaseCrawler
-from LotteOn_crawler import LotteOnCrawler  # ← 필요한 크롤러만 불러와
+from review_analysis.crawling.base_crawler import BaseCrawler
+from review_analysis.crawling.naver_crawler import NaverCrawler
+from review_analysis.crawling.emart_crawler import EmartCrawler
+from review_analysis.crawling.LotteOn_crawler import LotteOnCrawler
 
-# 사용할 크롤러를 등록
+
+# 모든 크롤링 클래스를 예시 형식으로 적어주세요. 
 CRAWLER_CLASSES: Dict[str, Type[BaseCrawler]] = {
+    "naver": NaverCrawler,
+    "emart": EmartCrawler,
     "lotteon": LotteOnCrawler,
 }
+
 
 def create_parser() -> ArgumentParser:
     parser = ArgumentParser()
     parser.add_argument('-o', '--output_dir', type=str, required=True, help="Output file directory. Example: ../../database")
     parser.add_argument('-c', '--crawler', type=str, required=False, choices=CRAWLER_CLASSES.keys(),
                         help=f"Which crawler to use. Choices: {', '.join(CRAWLER_CLASSES.keys())}")
-    parser.add_argument('-a', '--all', action='store_true', help="Run all crawlers. Default to False.")
+    parser.add_argument('-a', '--all', action='store_true', 
+                        help="Run all crawlers. Default to False.")    
     return parser
 
 if __name__ == "__main__":
     parser = create_parser()
     args = parser.parse_args()
 
-    if args.all:
+    if args.all: 
         for crawler_name in CRAWLER_CLASSES.keys():
-            CrawlerClass = CRAWLER_CLASSES[crawler_name]
-            crawler = CrawlerClass(args.output_dir)
-            crawler.start_browser()
+            Crawler_class = CRAWLER_CLASSES[crawler_name]
+            crawler = Crawler_class(args.output_dir)
             crawler.scrape_reviews()
             crawler.save_to_database()
-
+     
     elif args.crawler:
-        CrawlerClass = CRAWLER_CLASSES[args.crawler]
-        crawler = CrawlerClass(args.output_dir)
-        crawler.start_browser()
+        Crawler_class = CRAWLER_CLASSES[args.crawler]
+        crawler = Crawler_class(args.output_dir)
         crawler.scrape_reviews()
         crawler.save_to_database()
-
+    
     else:
-        raise ValueError("No crawler specified. Use --crawler or --all.")
+        raise ValueError("No crawlers.")
