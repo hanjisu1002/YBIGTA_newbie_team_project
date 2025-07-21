@@ -10,7 +10,9 @@ from review_analysis.crawling.LotteOn_crawler import LotteOnCrawler
 CRAWLER_CLASSES: Dict[str, Type[BaseCrawler]] = {
     "naver": NaverCrawler,
     "emart": EmartCrawler,
+    "lotteon": LotteOnCrawler,
 }
+
 
 def create_parser() -> ArgumentParser:
     parser = ArgumentParser()
