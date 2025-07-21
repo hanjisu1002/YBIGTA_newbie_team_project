@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium import webdriver
 
+#ABC : Abstract Base Class
+
 ######## 수정 금지 #########
 class BaseCrawler(ABC):
     def __init__(self, output_dir: str):
