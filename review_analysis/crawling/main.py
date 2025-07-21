@@ -1,12 +1,26 @@
 from argparse import ArgumentParser
 from typing import Dict, Type
 from review_analysis.crawling.base_crawler import BaseCrawler
+<<<<<<< HEAD
 from review_analysis.crawling.emart_crawler import EmartCrawler
 
 # 모든 크롤링 클래스를 예시 형식으로 적어주세요. 
 CRAWLER_CLASSES: Dict[str, Type[BaseCrawler]] = {
     "emart": EmartCrawler,
+=======
+from review_analysis.crawling.naver_crawler import NaverCrawler
+from review_analysis.crawling.emart_crawler import EmartCrawler
+from review_analysis.crawling.LotteOn_crawler import LotteOnCrawler
+
+
+# 모든 크롤링 클래스를 예시 형식으로 적어주세요. 
+CRAWLER_CLASSES: Dict[str, Type[BaseCrawler]] = {
+    "naver": NaverCrawler,
+    "emart": EmartCrawler,
+    "lotteon": LotteOnCrawler,
+>>>>>>> main
 }
+
 
 def create_parser() -> ArgumentParser:
     parser = ArgumentParser()

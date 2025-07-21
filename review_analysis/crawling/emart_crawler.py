@@ -22,15 +22,20 @@ class EmartCrawler(BaseCrawler):
         self.columns = ['date', 'rate', 'review']
         self.values: list[list[str]] = []
         self.driver = None
+        self.driver = self._start_browser()
 
-    def start_browser(self):
+    def _start_browser(self):
         chrome_options = Options()
         chrome_options.add_experimental_option("detach", True)
         chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
-        self.driver = webdriver.Chrome(
+        driver = webdriver.Chrome(
             service=Service(ChromeDriverManager().install()),
             options=chrome_options
         )
+        return driver
+    
+    def start_browser(self):
+        pass
 
     def scrape_reviews(self):
         self.driver.get(self.url)
