@@ -3,6 +3,7 @@ import os
 import re
 from datetime import datetime
 from review_analysis.preprocessing.base_processor import BaseDataProcessor
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 class ExampleProcessor(BaseDataProcessor):
     def __init__(self, input_path: str, output_path: str):
@@ -82,11 +83,27 @@ class ExampleProcessor(BaseDataProcessor):
         self.df["date"] = self.df["date"].apply(convert_date)
 
         # 날짜 처리 및 요일 파생 변수 생성
-        # 날짜 처리 및 요일 파생 변수 생성
         self.df['date'] = self.df['date'].apply(convert_date)
         self.df['weekday'] = pd.to_datetime(self.df['date'], format="%y-%m-%d", errors='coerce').dt.day_name()
 
+    def feature_engineering(self):
+        # TF-IDF 벡터화
+        vectorizer = TfidfVectorizer(
+            max_features=300,
+            stop_words=None,
+            token_pattern=r"(?u)\b\w+\b"
+        )
+        tfidf_matrix = vectorizer.fit_transform(self.df["review"])
 
+        # 저장을 위해 DataFrame으로 변환
+        tfidf_df = pd.DataFrame(tfidf_matrix.toarray(), columns=vectorizer.get_feature_names_out())
+
+        # 기존 self.df와 합치기
+        self.df = pd.concat([self.df.reset_index(drop=True), tfidf_df.reset_index(drop=True)], axis=1)
+
+        # 저장을 위해 보관
+        self.vectorizer = vectorizer
+        self.tfidf_matrix = tfidf_matrix
     
     def save_to_database(self):
         if "naver" in self.input_path:
@@ -101,4 +118,4 @@ class ExampleProcessor(BaseDataProcessor):
         filename = f"preprocessed_reviews_{site_name}.csv"
         save_path = os.path.join(self.output_dir, filename)
         self.df.to_csv(save_path, index=False)
-        
+    
