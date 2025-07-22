@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from typing import Dict, Type
+from typing import Dict, Type, cast
 from review_analysis.crawling.base_crawler import BaseCrawler
 from review_analysis.crawling.naver_crawler import NaverCrawler
 from review_analysis.crawling.emart_crawler import EmartCrawler
@@ -8,9 +8,9 @@ from review_analysis.crawling.LotteOn_crawler import LotteOnCrawler
 
 # 모든 크롤링 클래스를 예시 형식으로 적어주세요. 
 CRAWLER_CLASSES: Dict[str, Type[BaseCrawler]] = {
-    "naver": NaverCrawler,
-    "emart": EmartCrawler,
-    "lotteon": LotteOnCrawler,
+    "naver": cast(Type[BaseCrawler], NaverCrawler),
+    "emart": cast(Type[BaseCrawler], EmartCrawler),
+    "lotteon": cast(Type[BaseCrawler], LotteOnCrawler),
 }
 
 

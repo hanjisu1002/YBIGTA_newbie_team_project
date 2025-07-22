@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
+from typing import Any
 import time
 import csv
 import os
@@ -26,7 +27,7 @@ class NaverCrawler(BaseCrawler):
     def __init__(self, output_dir: str):
         super().__init__(output_dir)
         self.url = "https://brand.naver.com/cocacola/products/4624572909"
-        self.reviews = []
+        self.reviews: list[Any] = []
 
     def start_browser(self):
         """
