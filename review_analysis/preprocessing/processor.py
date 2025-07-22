@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 import re
 from datetime import datetime
 from review_analysis.preprocessing.base_processor import BaseDataProcessor
@@ -11,24 +12,31 @@ class ExampleProcessor(BaseDataProcessor):
     def preprocess(self):
         self.df.columns = self.df.columns.str.strip()
 
-        # naver 컬럼명 변경
+        # 사이트별 컬럼명 변경
         if "naver" in self.input_path:
             self.df.rename(columns={"별점": "rate", "날짜": "date", "리뷰": "review"}, inplace=True)
+        elif "emart" in self.input_path:
+            self.df.rename(columns={"평점": "rate", "작성일": "date", "내용": "review"}, inplace=True)
+        elif "lotteon" in self.input_path:
+            self.df.rename(columns={"점수": "rate", "날짜": "date", "리뷰내용": "review"}, inplace=True)
 
         # 날짜 변환 함수
         def convert_date(date_str):
             try:
                 date_str = date_str.strip()
-                if len(date_str) == 10 and date_str.count('.') == 2:
-                    dt = datetime.strptime(date_str, "%Y.%m.%d")
-                    return dt.strftime("%y.%m.%d")
-                elif len(date_str) == 9 and date_str.endswith('.'):
-                    return date_str[:-1]
-                else:
-                    return date_str
+                if date_str.endswith("."):
+                    date_str = date_str[:-1]
+
+                for fmt in ["%y.%m.%d", "%y-%m-%d", "%Y-%m-%d", "%Y.%m.%d"]:
+                    try:
+                        dt = datetime.strptime(date_str, fmt)
+                        return dt.strftime("%y-%m-%d")
+                    except ValueError:
+                        continue
+                return None
             except:
                 return None
-
+            
         def truncate_review(text, max_len=100, min_len=80):
             if len(text) <= max_len:
                 return text
@@ -70,15 +78,27 @@ class ExampleProcessor(BaseDataProcessor):
         # 리뷰 전처리
         self.df["review"] = self.df["review"].apply(clean_review)
 
+        # 날짜 변환
+        self.df["date"] = self.df["date"].apply(convert_date)
 
-    def feature_engineering(self):
-        pass
+        # 날짜 처리 및 요일 파생 변수 생성
+        # 날짜 처리 및 요일 파생 변수 생성
+        self.df['date'] = self.df['date'].apply(convert_date)
+        self.df['weekday'] = pd.to_datetime(self.df['date'], format="%y-%m-%d", errors='coerce').dt.day_name()
 
+
+    
     def save_to_database(self):
-         # 날짜 기준으로 오래된 순 정렬
-        self.df = self.df.sort_values(by="date")
-        filename = self.input_path.split("/")[-1].replace("reviews_", "preprocessed_reviews_")
-        save_path = f"{self.output_dir}/{filename}"
+        if "naver" in self.input_path:
+            site_name = "naver"
+        elif "emart" in self.input_path:
+            site_name = "emart"
+        elif "lotteon" in self.input_path:
+            site_name = "lotteon"
+        else:
+            raise ValueError("Unknown site in input_path")
 
+        filename = f"preprocessed_reviews_{site_name}.csv"
+        save_path = os.path.join(self.output_dir, filename)
         self.df.to_csv(save_path, index=False)
         
