@@ -1,7 +1,11 @@
 import os
 import time
 import pandas as pd
+<<<<<<< HEAD
 from review_analysis.crawling.base_crawler import BaseCrawler  
+=======
+from .base_crawler import BaseCrawler  
+>>>>>>> jisu
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
