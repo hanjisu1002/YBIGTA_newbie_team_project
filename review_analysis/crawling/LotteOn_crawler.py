@@ -1,7 +1,7 @@
 import os
 import time
 import pandas as pd
-from base_crawler import BaseCrawler  
+from .base_crawler import BaseCrawler  
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
