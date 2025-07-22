@@ -24,7 +24,12 @@ class LotteOnCrawler(BaseCrawler):
         super().__init__(output_dir)
         self.base_url = "https://www.lotteon.com/p/product/LD755546264"  # 코카콜라 190ml 60캔
 
-    def start_browser(self):
+    def scroll_until_review_loaded(self, scroll_count=5, delay=2):
+        for _ in range(scroll_count):
+            self.driver.execute_script("window.scrollBy(0, 1500);")
+            time.sleep(delay)
+            
+    def scrape_reviews(self):
         options = Options()
         options.add_experimental_option("detach", True)
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
@@ -33,13 +38,6 @@ class LotteOnCrawler(BaseCrawler):
         self.driver.get(self.base_url)
         time.sleep(3)
 
-    def scroll_until_review_loaded(self, scroll_count=5, delay=2):
-        for i in range(scroll_count):
-            self.driver.execute_script("window.scrollBy(0, 1500);")
-            time.sleep(delay)
-
-
-    def scrape_reviews(self):
         values = []
         page = 1
 
@@ -52,16 +50,17 @@ class LotteOnCrawler(BaseCrawler):
                 print(f"❌ 리뷰 요소 탐색 실패: {e}")
                 break
 
-            for idx, row in enumerate(review_elements):
+            for row in review_elements:
                 try:
                     date = row.find_element(By.CSS_SELECTOR, 'span.date').text.strip()
                     star = float(row.find_element(By.CSS_SELECTOR, 'div.staring > em').text.strip())
                     review = row.find_element(By.CSS_SELECTOR, 'span.texting').text.strip().replace('\n', ' ').replace('\r', ' ')
                     values.append([date, star, review])
-                    
+
                     if len(values) >= 500:
                         print("500개 리뷰 수집 완료")
                         self.reviews = values
+                        self.driver.quit()
                         return
                 except Exception:
                     continue
@@ -79,7 +78,9 @@ class LotteOnCrawler(BaseCrawler):
                 print(f"❌ 다음 페이지 이동 실패: {e}")
                 break
 
+        self.driver.quit()
         self.reviews = values
+
 
     def save_to_database(self):
         if not hasattr(self, 'reviews') or not self.reviews:
