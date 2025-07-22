@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import time
 import os
+import csv
 
 
 class EmartCrawler(BaseCrawler):
@@ -33,7 +34,7 @@ class EmartCrawler(BaseCrawler):
             options=chrome_options
         )
         return driver
-    
+
     def start_browser(self):
         pass
 
@@ -64,7 +65,9 @@ class EmartCrawler(BaseCrawler):
                 blank.append(rate.get_text(strip=True).replace('\n', ' ') if rate else "별점 없음")
 
                 text = row.find('p', class_='rvw_item_text')
-                blank.append(text.get_text(strip=True).replace('\n', ' ') if text else "리뷰 없음")
+                review = text.get_text(strip=True).replace('\n', ' ') if text else "리뷰 없음"
+                review = review.replace('\r', ' ')
+                blank.append(review)
 
                 self.values.append(blank)
 
@@ -75,5 +78,5 @@ class EmartCrawler(BaseCrawler):
         os.makedirs(self.output_dir, exist_ok=True)
         df = pd.DataFrame(self.values, columns=self.columns)
         output_file = os.path.join(self.output_dir, "reviews_emart.csv")
-        df.to_csv(output_file, index=False, encoding='utf-8-sig')
+        df.to_csv(output_file, index=False, encoding='utf-8-sig', quoting=csv.QUOTE_ALL)
         print(f"저장 완료: {output_file}")
