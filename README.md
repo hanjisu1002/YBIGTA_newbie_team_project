@@ -8,12 +8,37 @@
 
 ### 크롤링한 데이터 형식
 
-- 총 500개의 리뷰
+- 총 500개의 리뷰를 최대 수집하도록 설정되어 있습니다.
+
+리뷰는 스크롤을 통해 로딩되며, 이후 페이지를 넘기며 반복적으로 데이터를 수집합니다.
+리뷰 한 건에 포함되는 정보: 날짜, 별점, 리뷰글
+이 중 하나라도 누락된 경우 해당 리뷰는 제외되어 저장되지 않습니다.
+따라서 최종 저장된 CSV에는 결측치(Null 값)가 존재하지 않습니다. 
+
 - CSV 파일로 저장됨 (`reviews_lotteon.csv`)
+저장 경로는 output_dir 인자로 지정한 경로이며, 파일명은 reviews_lotteon.csv입니다.
+
 - 열(column) 구성:
   - `date`: 리뷰 작성일 (문자열)
   - `star`: 별점 (실수형, 1.0 ~ 5.0)
   - `review`: 리뷰 본문 (문자열)
+
+각 리뷰는 다음의 CSS Selector 기반으로 구성되어 있습니다:
+날짜: span.date
+별점: div.staring > em
+리뷰: span.texting
+
+크롤링 실행 예시
+#- crawling 디렉토리에서 실행하는 경우
+
+PYTHONPATH=../../ python main.py -c lotteon -o ../../database
+ 크롤링 중 발생할 수 있는 이슈
+LotteON 웹사이트는 동적 로딩 구조이기 때문에, 페이지 로딩이 느리거나 요소 탐색 실패 시 크롤링이 중단될 수 있습니다.
+
+만약 아래와 같은 메시지가 발생한다면 사이트 구조 변경 혹은 일시적인 접속 이슈일 수 있습니다.
+리뷰 요소 탐색 실패: …
+다음 페이지 이동 실패: …
+이 경우 몇 분 후 재시도하거나 **페이지 스크롤 수와 대기 시간(delay)**을 조정해보시기 바랍니다.
 
 
 ## Naver 리뷰 크롤링
@@ -60,21 +85,6 @@ IndexError: list index out of range
 
 
 
-## 실행 방법
-
-  ```bash
-  특정 크롤러 실행
-  YBIGTA_newbie_team_project directory 기준
-  PYTHONPATH=. python review_analysis/crawling/main.py -o review_analysis/output --crawler lotteon
-  PYTHONPATH=. python review_analysis/crawling/main.py -o review_analysis/output --crawler emart
-  PYTHONPATH=. python review_analysis/crawling/main.py -o review_analysis/output --crawler naver
-
-  모든 크롤러 실행 (전체 병합 실행 시)
-  YBIGTA_newbie_team_project directory 기준
-  PYTHONPATH=. python review_analysis/crawling/main.py -o review_analysis/output --all
-  ```
-  실행 시 reviews_{crawler_name}.csv 형식의 csv 파일 세 개가 생성됩니다. 
-  각 csv 파일은 날짜,별점,리뷰(date, rate, review)로 구성되어 있습니다. 
 
 
 
@@ -176,14 +186,6 @@ tokenizer=normalize_korean_text,
   TF-IDF 점수는 문서별 단어 중요도를 나타내는데, 각 플랫폼별 리뷰 전체에 대해 단어별 평균 TF-IDF를 계산하였습니다. 
 이를 이용해 아래 텍스트 비교 분석 파트에서 시각화와 함께 세 플랫폼에서 나타나는 리뷰의 특징을 분석해보았습니다. 
 
-### 실행 방법
-
-  ```bash
-  review_analysis directory 기준, 
-  PYTHONPATH=.. python preprocessing/main.py
-  ```
-  를 실행하면 preprocessed_reviewes_{key}.csv 에 해당하는 csv 파일 세 개가 생성됩니다. 
-  각 csv 파일은 전처리된 날짜, 별점, 리뷰, 요일(date, rate, review, weekday)로 구성되어 있습니다. 
 
 
 
@@ -225,7 +227,6 @@ Naver의 경우, 크롤링 시점이 편향적으로 특정 시점에 몰려 있
 LotteON은 2021년 8월과 2022년 9월에 리뷰 수가 눈에 띄게 증가한 시기가 있으며, 이는 해당 상품의 시즌성 판매 또는 마케팅 이벤트 등으로 인해 계절성을 가질 가능성이 있습니다.
 Emart는 2023년 11월에 리뷰 수가 급격히 증가한 것이 확인되었으나, 이 증가 원인은 추가적인 외부 요인 분석이 필요합니다. 전반적으로 Emart와 LotteON의 리뷰는 여러 시점에 걸쳐 분포하고 있어 시계열 분석이 가능합니다.
 
-
 2. 요일별 리뷰 개수 분석
 
 ![요일별 리뷰 개수 분석](review_analysis/plots/weekday_count_sites.png)
@@ -236,7 +237,6 @@ Emart는 화요일, LotteON과 Naver는 수요일에 리뷰가 다소 집중되�
 그러나 전체적으로는 특정 요일에 뚜렷하게 집중된 경향은 보이지 않았으며, 세 사이트 모두 평균 수준의 고른 분포를 나타냅니다.
 이는 ‘콜라’라는 상품이 요일에 따라 구매 패턴이 달라지는 소비재가 아니라, 물과 같이 일상적으로 소비되는 필수재 성격을 갖기 때문일 가능성이 있습니다.
 
-
 3. 월별 평균 평점 분석
 
 ![사이트별 월별 평균 별점](review_analysis/plots/rating_distribution_by_site.png)
@@ -246,4 +246,56 @@ Emart는 화요일, LotteON과 Naver는 수요일에 리뷰가 다소 집중되�
 특히 LotteON의 경우, 리뷰를 추천순으로 정렬한 상위 500개만 수집했기 때문에, 긍정적인 평가 위주로 편향되어 있을 가능성이 높습니다.
 상품 자체가 대체로 특가 상품으로 판매되며, 대량 구매가 잦고 상품에 대한 기대치가 명확한 만큼 평점이 높게 나타나는 경향이 있는 것으로 분석됩니다.
 
-# 3. Git 과제 - 팀원 소개
+# 3. Git 과제 
+
+## github 설정
+
+### branch_protection.png
+![branch_protection](branch_protection.png)
+
+### push_rejected.png
+![push_rejected](push_rejected.png)
+
+### review_and_merged
+![review_and_merged](review_and_merged.png)
+
+## 팀원 소개
+안녕하세요 저희 팀은 팀장 한지수, 팀원 구남혁, 강예서로 이루어져있습니다. 저희는 키워드로 자기소개를 해보았습니다.
+
+한지수(03)
+인공지능학과 23학번
+
+구남혁(03)
+응용통계학과 22학번
+
+\# ESFJ \# DA팀 \# 축구 
+
+강예서(04)
+경영학과 23학번
+
+## 실행 방법
+
+### 크롤러 실행
+
+  ```bash
+  특정 크롤러 실행
+  YBIGTA_newbie_team_project directory 기준
+  PYTHONPATH=. python review_analysis/crawling/main.py -o review_analysis/output --crawler lotteon
+  PYTHONPATH=. python review_analysis/crawling/main.py -o review_analysis/output --crawler emart
+  PYTHONPATH=. python review_analysis/crawling/main.py -o review_analysis/output --crawler naver
+
+  모든 크롤러 실행 (전체 병합 실행 시)
+  YBIGTA_newbie_team_project directory 기준
+  PYTHONPATH=. python review_analysis/crawling/main.py -o review_analysis/output --all
+  ```
+  실행 시 reviews_{crawler_name}.csv 형식의 csv 파일 세 개가 생성됩니다. 
+  각 csv 파일은 날짜,별점,리뷰(date, rate, review)로 구성되어 있습니다. 
+
+### 전처리/FE 실행
+
+  ```bash
+  review_analysis directory 기준, 
+  PYTHONPATH=.. python preprocessing/main.py
+  ```
+  를 실행하면 preprocessed_reviewes_{key}.csv 에 해당하는 csv 파일 세 개가 생성됩니다. 
+  각 csv 파일은 전처리된 날짜, 별점, 리뷰, 요일(date, rate, review, weekday)로 구성되어 있습니다. 
