@@ -14,7 +14,7 @@ from review_analysis.preprocessing.lotteon_processor import LotteOnProcessor
 PREPROCESS_CLASSES: Dict[str, Type[BaseDataProcessor]] = {
     "reviews_naver": cast(Type[BaseDataProcessor], NaverProcessor),
     "reviews_emart": cast(Type[BaseDataProcessor], EmartProcessor),
-    "reviews_lotteon": cast(Type[BaseDataProcessor], NaverProcessor),
+    "reviews_lotteon": cast(Type[BaseDataProcessor], LotteOnProcessor),
 }
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))

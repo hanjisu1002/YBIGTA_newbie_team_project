@@ -10,7 +10,6 @@ def keyword_comparison(df):
     tfidf_cols = df.columns[~df.columns.isin(['rate', 'date', 'review', 'weekday'])]
     tfidf_df = df[tfidf_cols]
 
-
     # 시각화 스타일 지정
     sns.set_style("whitegrid")
     sns.set_palette("muted")
