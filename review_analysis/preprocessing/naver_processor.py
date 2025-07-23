@@ -14,7 +14,6 @@ class NaverProcessor(BaseDataProcessor):
         self.df.columns = self.df.columns.str.strip()
         self.df.rename(columns={"별점": "rate", "날짜": "date", "리뷰": "review"}, inplace=True)
 
-
         # 날짜 변환 함수
         def convert_date(date_str):
             try:
@@ -79,10 +78,6 @@ class NaverProcessor(BaseDataProcessor):
        
 
     def feature_engineering(self):
-        print("🧪 feature_engineering 실행됨")
-        print("✅ 리뷰 개수:", len(self.df))
-        print("✅ Null 리뷰 개수:", self.df["review"].isnull().sum())
-        print("✅ 예시 리뷰:", self.df["review"].head(1).values)
          # 날짜 처리 및 요일 파생 변수 생성
         self.df['weekday'] = pd.to_datetime(self.df['date'], format="%y-%m-%d", errors='coerce').dt.day_name()
 
@@ -100,9 +95,6 @@ class NaverProcessor(BaseDataProcessor):
 
         # 기존 self.df와 합치기
         self.df = pd.concat([self.df.reset_index(drop=True), tfidf_df.reset_index(drop=True)], axis=1)
-
-        print("✅ 최종 컬럼 수:", len(self.df.columns))
-        print("✅ 마지막 5개 컬럼:", self.df.columns[-5:])
 
 
         # 저장을 위해 보관
