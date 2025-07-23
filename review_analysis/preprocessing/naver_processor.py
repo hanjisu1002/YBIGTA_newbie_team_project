@@ -5,21 +5,15 @@ from datetime import datetime
 from review_analysis.preprocessing.base_processor import BaseDataProcessor
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-class ExampleProcessor(BaseDataProcessor):
+class NaverProcessor(BaseDataProcessor):
     def __init__(self, input_path: str, output_path: str):
         super().__init__(input_path, output_path)
         self.df = pd.read_csv(self.input_path)
 
     def preprocess(self):
         self.df.columns = self.df.columns.str.strip()
+        self.df.rename(columns={"별점": "rate", "날짜": "date", "리뷰": "review"}, inplace=True)
 
-        # 사이트별 컬럼명 변경
-        if "naver" in self.input_path:
-            self.df.rename(columns={"별점": "rate", "날짜": "date", "리뷰": "review"}, inplace=True)
-        elif "emart" in self.input_path:
-            self.df.rename(columns={"평점": "rate", "작성일": "date", "내용": "review"}, inplace=True)
-        elif "lotteon" in self.input_path:
-            self.df.rename(columns={"점수": "rate", "날짜": "date", "리뷰내용": "review"}, inplace=True)
 
         # 날짜 변환 함수
         def convert_date(date_str):

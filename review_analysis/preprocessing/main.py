@@ -3,15 +3,18 @@ import glob
 from argparse import ArgumentParser
 from typing import Dict, Type, cast
 from review_analysis.preprocessing.base_processor import BaseDataProcessor
-from review_analysis.preprocessing.processor import ExampleProcessor
+from review_analysis.preprocessing.naver_processor import NaverProcessor
+from review_analysis.preprocessing.emart_processor import EmartProcessor
+from review_analysis.preprocessing.lotteon_processor import LotteOnProcessor
+
 
 
 # 모든 preprocessing 클래스를 예시 형식으로 적어주세요. 
 # key는 "reviews_사이트이름"으로, value는 해당 처리를 위한 클래스
 PREPROCESS_CLASSES: Dict[str, Type[BaseDataProcessor]] = {
-    "reviews_naver": cast(Type[BaseDataProcessor], ExampleProcessor),
-    "reviews_emart": cast(Type[BaseDataProcessor], ExampleProcessor),
-    "reviews_lotteon": cast(Type[BaseDataProcessor], ExampleProcessor),
+    "reviews_naver": cast(Type[BaseDataProcessor], NaverProcessor),
+    "reviews_emart": cast(Type[BaseDataProcessor], EmartProcessor),
+    "reviews_lotteon": cast(Type[BaseDataProcessor], NaverProcessor),
 }
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
