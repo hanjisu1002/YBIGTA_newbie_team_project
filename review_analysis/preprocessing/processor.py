@@ -82,12 +82,10 @@ class ExampleProcessor(BaseDataProcessor):
         self.df["date"] = self.df["date"].apply(convert_date)
 
         # 날짜 처리 및 요일 파생 변수 생성
-        # 날짜 처리 및 요일 파생 변수 생성
         self.df['date'] = self.df['date'].apply(convert_date)
         self.df['weekday'] = pd.to_datetime(self.df['date'], format="%y-%m-%d", errors='coerce').dt.day_name()
 
 
-    
     def save_to_database(self):
         if "naver" in self.input_path:
             site_name = "naver"
