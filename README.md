@@ -20,7 +20,7 @@
 
 ### 크롤링 대상 사이트
 
-- [네이버쇼핑 - 코카콜라 190ml 60캔 상품 페이지]("https://brand.naver.com/cocacola/products/4624572909")
+- [네이버쇼핑 - 코카콜라 190ml 60캔 상품 페이지](https://brand.naver.com/cocacola/products/4624572909)
 
 ### 크롤링한 데이터 형식
 
@@ -38,7 +38,7 @@
 
 (fastapi-env) (base) hanjisu@hanjisuui-MacBookAir crawling % PYTHONPATH=../../ python main.py -c naver -o ../../database
 
-📄 1 페이지 크롤링 중...
+1 페이지 크롤링 중...
 Traceback (most recent call last):
   File "/Users/hanjisu/Desktop/YBIGTA_newbie_team_project/review_analysis/crawling/main.py", line 34, in <module>
     crawler.scrape_reviews()
@@ -179,8 +179,7 @@ tokenizer=normalize_korean_text,
 ### 실행 방법
 
   ```bash
-  /Users/hanjisu/Desktop/YBIGTA_newbie_team_project/review_analysis directory 기준, 
-  cd review_analysis
+  review_analysis directory 기준, 
   PYTHONPATH=.. python preprocessing/main.py
   ```
   를 실행하면 preprocessed_reviewes_{key}.csv 에 해당하는 csv 파일 세 개가 생성됩니다. 
