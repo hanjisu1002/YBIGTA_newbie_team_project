@@ -10,10 +10,10 @@
 
 - 총 500개의 리뷰를 최대 수집하도록 설정되어 있습니다.
 
-리뷰는 스크롤을 통해 로딩되며, 이후 페이지를 넘기며 반복적으로 데이터를 수집합니다.
-리뷰 한 건에 포함되는 정보: 날짜, 별점, 리뷰글
-이 중 하나라도 누락된 경우 해당 리뷰는 제외되어 저장되지 않습니다.
-따라서 최종 저장된 CSV에는 결측치(Null 값)가 존재하지 않습니다.
+  리뷰는 스크롤을 통해 로딩되며, 이후 페이지를 넘기며 반복적으로 데이터를 수집합니다.
+  리뷰 한 건에 포함되는 정보: 날짜, 별점, 리뷰글
+  이 중 하나라도 누락된 경우 해당 리뷰는 제외되어 저장되지 않습니다.
+  따라서 최종 저장된 CSV에는 결측치(Null 값)가 존재하지 않습니다.
 
 - CSV 파일로 저장됨 (`reviews_lotteon.csv`)
   저장 경로는 output_dir 인자로 지정한 경로이며, 파일명은 reviews_lotteon.csv입니다.
@@ -24,15 +24,21 @@
   - `review`: 리뷰 본문 (문자열)
 
 각 리뷰는 다음의 CSS Selector 기반으로 구성되어 있습니다:
-날짜: span.date
-별점: div.staring > em
-리뷰: span.texting
 
-크롤링 실행 예시
-#- crawling 디렉토리에서 실행하는 경우
+- 날짜: span.date
+- 별점: div.staring > em
+- 리뷰: span.texting
 
+### 크롤링 실행 예시
+
+crawling 디렉토리에서 실행하는 경우:
+
+```bash
 PYTHONPATH=../../ python main.py -c lotteon -o ../../database
-크롤링 중 발생할 수 있는 이슈
+```
+
+### 크롤링 중 발생할 수 있는 이슈
+
 LotteON 웹사이트는 동적 로딩 구조이기 때문에, 페이지 로딩이 느리거나 요소 탐색 실패 시 크롤링이 중단될 수 있습니다.
 
 만약 아래와 같은 메시지가 발생한다면 사이트 구조 변경 혹은 일시적인 접속 이슈일 수 있습니다.
@@ -58,11 +64,15 @@ LotteON 웹사이트는 동적 로딩 구조이기 때문에, 페이지 로딩�
   - `날짜`: 리뷰 작성일 (문자열),`리뷰`: 리뷰 본문 (문자열) : class "\_2L3vDiadT9" 에 webelement 로 존재
     -> "\_2L3vDiadT9" 에 해당하는 web element를 text화 한 후 날짜 형식 (xx.xx.xx.)을 기준으로 list element 생성하여 index 기준으로 날짜와 리뷰 추출
 
-#- Naver 리뷰 크롤링에서
+### Naver 리뷰 크롤링 예시
 
+```bash
 (fastapi-env) (base) hanjisu@hanjisuui-MacBookAir crawling % PYTHONPATH=../../ python main.py -c naver -o ../../database
+```
 
-📄 1 페이지 크롤링 중...
+1 페이지 크롤링 중...
+
+`````text
 Traceback (most recent call last):
 File "/Users/hanjisu/Desktop/YBIGTA_newbie_team_project/review_analysis/crawling/main.py", line 34, in <module>
 crawler.scrape_reviews()
@@ -71,6 +81,7 @@ first_index = date_indices[0]
 
 ````^^^
 IndexError: list index out of range
+`````
 
 위 에러가 잘 작동하는 동일한 코드파일을 실행하더라도 랜덤으로 발생하는데, 다시 실행하면 잘 작동됩니다.
 따라서 혹시 위와 같은 에러가 발생한다면 사이트 접근 이슈일 것으로 추정되니 조금 기다렸다가 몇 번 다시 실행해주세요 🥹
@@ -79,35 +90,43 @@ IndexError: list index out of range
 
 ### 크롤링 대상 사이트
 
-- [이마트몰 - 코카콜라 190ml 30캔 상품 페이지]("https://emart.ssg.com/item/itemView.ssg?itemId=1000529473806&siteNo=6001&ckwhere=danawa&appPopYn=n&utm_medium=PCS&utm_source=danawa&utm_campaign=danawa_pcs&service_id=estimatedn")
+- [이마트몰 - 코카콜라 190ml 30캔 상품 페이지](https://emart.ssg.com/item/itemView.ssg?itemId=1000529473806&siteNo=6001&ckwhere=danawa&appPopYn=n&utm_medium=PCS&utm_source=danawa&utm_campaign=danawa_pcs&service_id=estimatedn)
 
 ### 크롤링한 데이터 형식
 
 - 총 최대 500개의 리뷰를 수집하도록 설정되어 있습니다.
-  리뷰는 별도 페이지 이동 없이 JavaScript 함수 (fn_GoCommentPage(page))를 호출해 페이지를 넘기며 순차적으로 수집됩니다.
+  리뷰는 JavaScript 함수 `fn_GoCommentPage(page)`를 호출하여 페이지를 순차적으로 이동하며 수집됩니다.
 
 - 리뷰 한 건에 포함되는 정보: 날짜, 별점, 리뷰글
 
-- CSV 파일로 저장됨 (reviews_emart.csv)
+- CSV 파일로 저장됨 (`reviews_emart.csv`)
   저장 경로는 output_dir 인자로 지정한 경로이며, 파일명은 reviews_emart.csv입니다.
   쉼표(,) 등 특수문자가 포함된 리뷰도 안전하게 저장되도록 모든 필드는 큰따옴표(" ")로 감싸 저장됩니다.
 
 - 열(column) 구성:
-  - date: 리뷰 작성일 (문자열, 예: "2025.07.24")
-  - rate: 별점 (실수형, 예: 5.0)
-  - review: 리뷰 본문 (문자열)
+  - `date`: 리뷰 작성일 (문자열, 예: "2025.07.24")
+  - `rate`: 별점 (실수형, 예: 5.0)
+  - `review`: 리뷰 본문 (문자열)
 
-크롤링 실행 예시:
-crawling 디렉토리에서 실행 (만약 현재 디렉토리가 crawling이 아니라면 cd를 통해 변경)
+각 리뷰는 다음의 CSS Selector 기반으로 구성되어 있습니다:
+
+- 날짜: div.rvw_item_label.rvw_item_date
+- 별점: em
+- 리뷰: p.rvw_item_text
+
+### 크롤링 실행 예시
+
+```bash
 PYTHONPATH=../../ python main.py -c emart -o ../../database
+```
 
-크롤링 중 발생할 수 있는 이슈:
+### 크롤링 중 발생할 수 있는 이슈
 
-- Emart 리뷰는 JS 기반 페이지 호출로 구성되어 있으며, 페이지 내 로딩 지연 또는 함수 호출 실패 시 크롤링이 중단될 수 있습니다.
-- 다음과 같은 메시지가 발생할 경우:
+- Emart 리뷰는 JS 기반 페이지 호출 구조로 되어 있어, 페이지 로딩 지연 또는 함수 호출 실패 시 크롤링이 중단될 수 있습니다.
+- 다음과 같은 메시지가 발생할 수 있습니다:
   - 페이지 이동 실패: ...
   - 리뷰 요소 탐색 실패: ...
-    이는 일시적인 사이트 응답 문제이거나 구조 변경 가능성이 있으므로, 페이지 로딩 대기시간(time.sleep)을 늘리거나 몇 분 후 재시도해보시기 바랍니다.
+    이 경우 페이지 로딩 대기시간(time.sleep)을 늘리거나 몇 분 후 재시도해보시기 바랍니다.
 
 # 2. EDA/FE + 시각화
 
@@ -224,7 +243,7 @@ TF-IDF 점수는 문서별 단어 중요도를 나타내는데, 각 플랫폼별
 아래는 플랫폼 별로 특징적인 단어들에 대한 분석입니다.
 
 - Naver
-  상위 키워드에 "빠른배송", "배송이", "딱", "한번에" 등의 합성어 또는 형식적인 표현이 포함되어 있고, 감성 단어로는 "너무", "좋습니다", "있어요" 등 다소 일반적인 표현이 다수를 차지하고 있습니다.
+  상위 키워드에 "빠른배송", "배송이", "딱", "한번에" 등의 합성어 또는 형식적인 표현이 포함되어 있고, 감성 단어로는 "너무", "좋습니다", "있어요" 등 다소 일반적인 표현이 다수를 차지하고 있습니다.  
   따라서 형식적인 리뷰나 반복적인 키워드 조합이 많을 것으로 예상합니다.
   또한 배송과 관련된 단어가 다수를 차지하고 있고, '빠른'과 함께 자주 등장하는 것으로 보아 소비자들의 배송에 대한 만족도가 높다고 보여집니다.
 
@@ -289,7 +308,7 @@ Emart는 화요일, LotteON과 Naver는 수요일에 리뷰가 다소 집중되�
 한지수(03)
 인공지능학과 23학번
 
-\팀장 \#ENTJ \#DS \#보컬_밴드
+\#팀장 \#ENTJ \#DS \#보컬\_밴드
 
 구남혁(03)
 응용통계학과 22학번
@@ -299,7 +318,7 @@ Emart는 화요일, LotteON과 Naver는 수요일에 리뷰가 다소 집중되�
 강예서(04)
 경영학과 23학번
 
-\# ISFP \#DA팀 \#일렉_밴드
+\# ISFP \#DA팀 \#일렉\_밴드
 
 ## 실행 방법
 
@@ -329,4 +348,3 @@ PYTHONPATH=.. python preprocessing/main.py
 
 를 실행하면 preprocessed*reviewes*{key}.csv 에 해당하는 csv 파일 세 개가 생성됩니다.
 각 csv 파일은 전처리된 날짜, 별점, 리뷰, 요일(date, rate, review, weekday)로 구성되어 있습니다.
-````
