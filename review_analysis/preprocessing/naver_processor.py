@@ -3,22 +3,16 @@ import os
 import re
 from datetime import datetime
 from review_analysis.preprocessing.base_processor import BaseDataProcessor
+from sklearn.feature_extraction.text import TfidfVectorizer
 
-class ExampleProcessor(BaseDataProcessor):
+class NaverProcessor(BaseDataProcessor):
     def __init__(self, input_path: str, output_path: str):
         super().__init__(input_path, output_path)
         self.df = pd.read_csv(self.input_path)
 
     def preprocess(self):
         self.df.columns = self.df.columns.str.strip()
-
-        # 사이트별 컬럼명 변경
-        if "naver" in self.input_path:
-            self.df.rename(columns={"별점": "rate", "날짜": "date", "리뷰": "review"}, inplace=True)
-        elif "emart" in self.input_path:
-            self.df.rename(columns={"평점": "rate", "작성일": "date", "내용": "review"}, inplace=True)
-        elif "lotteon" in self.input_path:
-            self.df.rename(columns={"점수": "rate", "날짜": "date", "리뷰내용": "review"}, inplace=True)
+        self.df.rename(columns={"별점": "rate", "날짜": "date", "리뷰": "review"}, inplace=True)
 
         # 날짜 변환 함수
         def convert_date(date_str):
@@ -81,12 +75,31 @@ class ExampleProcessor(BaseDataProcessor):
         # 날짜 변환
         self.df["date"] = self.df["date"].apply(convert_date)
 
-        # 날짜 처리 및 요일 파생 변수 생성
-        # 날짜 처리 및 요일 파생 변수 생성
-        self.df['date'] = self.df['date'].apply(convert_date)
+       
+
+    def feature_engineering(self):
+         # 날짜 처리 및 요일 파생 변수 생성
         self.df['weekday'] = pd.to_datetime(self.df['date'], format="%y-%m-%d", errors='coerce').dt.day_name()
 
 
+        # TF-IDF 벡터화
+        vectorizer = TfidfVectorizer(
+            max_features=300,
+            stop_words=None,
+            token_pattern=r"(?u)\b\w+\b"
+        )
+        tfidf_matrix = vectorizer.fit_transform(self.df["review"])
+
+        # 저장을 위해 DataFrame으로 변환
+        tfidf_df = pd.DataFrame(tfidf_matrix.toarray(), columns=vectorizer.get_feature_names_out())
+
+        # 기존 self.df와 합치기
+        self.df = pd.concat([self.df.reset_index(drop=True), tfidf_df.reset_index(drop=True)], axis=1)
+
+
+        # 저장을 위해 보관
+        self.vectorizer = vectorizer
+        self.tfidf_matrix = tfidf_matrix
     
     def save_to_database(self):
         if "naver" in self.input_path:
@@ -101,4 +114,4 @@ class ExampleProcessor(BaseDataProcessor):
         filename = f"preprocessed_reviews_{site_name}.csv"
         save_path = os.path.join(self.output_dir, filename)
         self.df.to_csv(save_path, index=False)
-        
+    
