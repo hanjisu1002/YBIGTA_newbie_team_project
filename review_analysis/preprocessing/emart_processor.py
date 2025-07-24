@@ -119,7 +119,6 @@ class EmartProcessor(BaseDataProcessor):
 
         # TF-IDF가 존재하는 경우 JSON으로 저장
         if hasattr(self, "vectorizer") and hasattr(self, "tfidf_matrix"):
-            import json
             tfidf_json = self.tfidf_df.to_dict(orient="records")
             json_path = os.path.join(self.output_dir, f"tfidf_{site_name}.json")
             with open(json_path, "w", encoding="utf-8") as f:
