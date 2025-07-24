@@ -280,13 +280,13 @@ Emart는 화요일, LotteON과 Naver는 수요일에 리뷰가 다소 집중되�
 ## github 설정
 
 ### branch_protection.png
-![branch_protection](branch_protection.png)
+![branch_protection](github/branch_protection.png)
 
 ### push_rejected.png
-![push_rejected](push_rejected.png)
+![push_rejected](github/push_rejected.png)
 
 ### review_and_merged
-![review_and_merged](review_and_merged.png)
+![review_and_merged](github/review_and_merged.png)
 
 ## 팀원 소개
 안녕하세요 저희 팀은 팀장 한지수, 팀원 구남혁, 강예서로 이루어져있습니다. 저희는 키워드를 이용하여 자기소개를 해보았습니다.
@@ -311,7 +311,7 @@ DS팀에 들어가고 싶어서 YBIGTA에 지원하였지만, 인공지능 외�
 올해 들어 일렉을 배우기 시작해서 요즘 남는 시간에는 일렉 연습을 하면서 보내고 있습니다. 혹시 또 일렉을 하시는 분이 계시다면 반갑게 인사해주세요:)
 
 ## WEB, 크롤링, EDA/FE 과제 실행 방법
-
+### 코드 실행 방법
 ### WEB 과제
 
 - fastAPI 앱(서버) 실행
