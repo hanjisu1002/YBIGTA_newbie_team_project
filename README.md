@@ -322,6 +322,26 @@ python3 -m http.server 8000 을 terminal에서 실행한 후
 http://localhost:8000/index.html 에 접속하여 디자인 구현 여부를 확인하실 수 있습니다. 
 
 
+### pytest, mypy test
+YBIGTA_newbie_team_project directory 에서
+- pytest 
+pip install pytest 이용하여 설치 후
+pytest . 실행
+
+- mypy
+pip install mypy 이용하여 설치 후
+mypy . 실행
+
+코드 구현 부분 외에 module import하는 과정에서 mypy error가 발생하였는데, 이러한 이유가 발생하는 이유를 https://mypy.readthedocs.io/en/stable/error_code_list.html에서 찾아보았습니다. 
+
+mypy는 정적 타입 검사기인데, 서드파티 라이브러리들은 타입 힌트를 제공하지 않거나, .pyi 스텁 파일이 없는 경우가 있다고 합니다.
+따라서 cv2, matplotlib, selenium, fastapi 등의 라이브러리들을 import할 때 
+error: Skipping analyzing "cv2": module is installed, but missing library stubs or py.typed marker
+와 같은 에러가 발생하며 타입 검사를 할 수 없어 에러가 발생했습니다. 
+
+mypy test를 수행하여 확인하고 싶은 것이 작성된 코드가 정해진 타입대로 동작하는지를 확인하는 것이라고 이해하였는데, 모듈의 설치 여부나 라이브러리의 타입 힌트 존재 여부가 코드의 동작여부 판단에 영향을 미치지 않을 것이라고 생각하여 불필요한 에러를 방지하기 위해 mypy.ini 파일을 이용해 라이브러리 import 부분의 에러만을 고려하지 않도록 설정하였습니다. 
+
+
 ### 크롤링 과제
 
   ```bash
@@ -348,3 +368,4 @@ http://localhost:8000/index.html 에 접속하여 디자인 구현 여부를 확
 
   를 실행하면 database 폴더에 preprocessed_reviewes_{key}.csv 에 해당하는 csv 파일 세 개와 tfidf_{key}.json 세 개가 생성됩니다. 
   각 csv 파일은 전처리된 날짜, 별점, 리뷰, 요일(date, rate, review, weekday)로 구성되어 있고, json 파일은 벡터화 된 단어들의 tf-idf 점수를 보여줍니다. 
+
