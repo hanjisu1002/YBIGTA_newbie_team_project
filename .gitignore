@@ -209,3 +209,8 @@ __marimo__/
 
 # macOS Finder
 .DS_Store
+
+# tfidf JSON 파일 무시
+tfidf_naver.json
+tfidf_emart.json
+tfidf_lotteon.json
