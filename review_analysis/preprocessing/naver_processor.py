@@ -93,15 +93,14 @@ class NaverProcessor(BaseDataProcessor):
         # 저장을 위해 DataFrame으로 변환
         tfidf_df = pd.DataFrame(tfidf_matrix.toarray(), columns=vectorizer.get_feature_names_out())
 
-        # 기존 self.df와 합치기
-        self.df = pd.concat([self.df.reset_index(drop=True), tfidf_df.reset_index(drop=True)], axis=1)
-
 
         # 저장을 위해 보관
         self.vectorizer = vectorizer
         self.tfidf_matrix = tfidf_matrix
+        self.tfidf_df = tfidf_df
     
     def save_to_database(self):
+        # 사이트 이름 결정
         if "naver" in self.input_path:
             site_name = "naver"
         elif "emart" in self.input_path:
@@ -111,7 +110,17 @@ class NaverProcessor(BaseDataProcessor):
         else:
             raise ValueError("Unknown site in input_path")
 
+        # CSV 저장
         filename = f"preprocessed_reviews_{site_name}.csv"
         save_path = os.path.join(self.output_dir, filename)
         self.df.to_csv(save_path, index=False)
-    
+        print(f"✅ CSV 저장 완료: {save_path}")
+
+        # TF-IDF가 존재하는 경우 JSON으로 저장
+        if hasattr(self, "vectorizer") and hasattr(self, "tfidf_matrix"):
+            import json
+            tfidf_json = self.tfidf_df.to_dict(orient="records")
+            json_path = os.path.join(self.output_dir, f"tfidf_{site_name}.json")
+            with open(json_path, "w", encoding="utf-8") as f:
+                json.dump(tfidf_json, f, ensure_ascii=False, indent=2)
+            print(f"TF-IDF JSON 저장 완료: {json_path}")
