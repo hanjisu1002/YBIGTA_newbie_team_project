@@ -79,12 +79,39 @@ IndexError: list index out of range
 ## 이마트몰 리뷰 크롤링
 
 ### 크롤링 대상 사이트
-- []("")
+
+- [이마트몰 - 코카콜라 190ml 30캔 상품 페이지](https://emart.ssg.com/item/itemView.ssg?itemId=1000529473806&siteNo=6001&ckwhere=danawa&appPopYn=n&utm_medium=PCS&utm_source=danawa&utm_campaign=danawa_pcs&service_id=estimatedn)
 
 ### 크롤링한 데이터 형식
 
+- 총 최대 500개의 리뷰를 수집하도록 설정되어 있습니다.
+  리뷰는 JavaScript 함수 `fn_GoCommentPage(page)`를 호출하여 페이지를 순차적으로 이동하며 수집됩니다.
+
+- 리뷰 한 건에 포함되는 정보: 날짜, 별점, 리뷰글
+
+- CSV 파일로 저장됨 (`reviews_emart.csv`)
+  저장 경로는 output_dir 인자로 지정한 경로이며, 파일명은 reviews_emart.csv입니다.
+  쉼표(,) 등 특수문자가 포함된 리뷰도 안전하게 저장되도록 모든 필드는 큰따옴표(" ")로 감싸 저장됩니다.
+
+- 열(column) 구성:
+  - `date`: 리뷰 작성일 (문자열, 예: "2025.07.24")
+  - `rate`: 별점 (실수형, 예: 5.0)
+  - `review`: 리뷰 본문 (문자열)
+
+각 리뷰는 다음의 CSS Selector 기반으로 구성되어 있습니다:
+
+- 날짜: div.rvw_item_label.rvw_item_date
+- 별점: em
+- 리뷰: p.rvw_item_text
 
 
+### 크롤링 중 발생할 수 있는 이슈
+
+- Emart 리뷰는 JS 기반 페이지 호출 구조로 되어 있어, 페이지 로딩 지연 또는 함수 호출 실패 시 크롤링이 중단될 수 있습니다.
+- 다음과 같은 메시지가 발생할 수 있습니다:
+  - 페이지 이동 실패: ...
+  - 리뷰 요소 탐색 실패: ...
+    이 경우 페이지 로딩 대기시간(time.sleep)을 늘리거나 몇 분 후 재시도해보시기 바랍니다.
 
 
 
