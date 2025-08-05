@@ -52,7 +52,7 @@ class LotteOnCrawler(BaseCrawler):
             try:
                 review_elements = self.driver.find_elements(By.CSS_SELECTOR, '#reviewMain > div')
             except Exception as e:
-                print(f"❌ 리뷰 요소 탐색 실패: {e}")
+                print(f"리뷰 요소 탐색 실패: {e}")
                 break
 
             for row in review_elements:
@@ -63,7 +63,7 @@ class LotteOnCrawler(BaseCrawler):
                     values.append([date, star, review])
 
                     if len(values) >= 500:
-                        print("✅ 500개 리뷰 수집 완료")
+                        print("500개 리뷰 수집 완료")
                         self.reviews = values
                         self.driver.quit()
                         return
@@ -73,14 +73,14 @@ class LotteOnCrawler(BaseCrawler):
             try:
                 next_btn = self.driver.find_element(By.CSS_SELECTOR, '#reviewMain .paginationArea .next')
                 if 'disabled' in next_btn.get_attribute('class'):
-                    print("🚫 다음 페이지 없음 — 종료")
+                    print("다음 페이지 없음 — 종료")
                     break
                 self.driver.execute_script("arguments[0].click();", next_btn)
                 time.sleep(2)
                 self.scroll_until_review_loaded(scroll_count=3)
                 page += 1
             except Exception as e:
-                print(f"❌ 다음 페이지 이동 실패: {e}")
+                print(f"다음 페이지 이동 실패: {e}")
                 break
 
         self.driver.quit()
@@ -88,11 +88,11 @@ class LotteOnCrawler(BaseCrawler):
 
     def save_to_database(self):
         if not hasattr(self, 'reviews') or not self.reviews:
-            print("⚠️ 저장할 리뷰가 없습니다.")
+            print("저장할 리뷰가 없습니다.")
             return
 
         df = pd.DataFrame(self.reviews, columns=['date', 'rate', 'review'])
         os.makedirs(self.output_dir, exist_ok=True)
         output_path = os.path.join(self.output_dir, 'reviews_lotteon.csv')
         df.to_csv(output_path, index=False, encoding='utf-8-sig', lineterminator='\n')
-        print(f"✅ 저장 완료: {output_path}")
+        print(f"저장 완료: {output_path}")
