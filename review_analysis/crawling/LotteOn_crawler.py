@@ -1,7 +1,7 @@
 import os
 import time
 import pandas as pd
-from base_crawler import BaseCrawler  
+from .base_crawler import BaseCrawler  
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -20,21 +20,26 @@ class LotteOnCrawler(BaseCrawler):
         output_dir (str): 리뷰 데이터를 저장할 디렉토리 경로
         base_url (str): 크롤링할 대상 상품 페이지 URL
     """
+
     def __init__(self, output_dir: str):
         super().__init__(output_dir)
-        self.base_url = "https://www.lotteon.com/p/product/LD755546264"  # 코카콜라 190ml 60캔
+        self.base_url = "https://www.lotteon.com/p/product/LD755546264"
 
-    def scroll_until_review_loaded(self, scroll_count=5, delay=2):
-        for _ in range(scroll_count):
-            self.driver.execute_script("window.scrollBy(0, 1500);")
-            time.sleep(delay)
-            
-    def scrape_reviews(self):
+    def start_browser(self):
+        """BaseCrawler의 추상 메서드 구현: 크롬 브라우저 실행"""
         options = Options()
         options.add_experimental_option("detach", True)
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
         self.driver = webdriver.Chrome(options=options)
         self.driver.set_window_size(1920, 1080)
+
+    def scroll_until_review_loaded(self, scroll_count=5, delay=2):
+        for _ in range(scroll_count):
+            self.driver.execute_script("window.scrollBy(0, 1500);")
+            time.sleep(delay)
+
+    def scrape_reviews(self):
+        self.start_browser()
         self.driver.get(self.base_url)
         time.sleep(3)
 
@@ -47,7 +52,7 @@ class LotteOnCrawler(BaseCrawler):
             try:
                 review_elements = self.driver.find_elements(By.CSS_SELECTOR, '#reviewMain > div')
             except Exception as e:
-                print(f"❌ 리뷰 요소 탐색 실패: {e}")
+                print(f"리뷰 요소 탐색 실패: {e}")
                 break
 
             for row in review_elements:
@@ -68,23 +73,22 @@ class LotteOnCrawler(BaseCrawler):
             try:
                 next_btn = self.driver.find_element(By.CSS_SELECTOR, '#reviewMain .paginationArea .next')
                 if 'disabled' in next_btn.get_attribute('class'):
-                    print("🚫 다음 페이지 없음 — 종료")
+                    print("다음 페이지 없음 — 종료")
                     break
                 self.driver.execute_script("arguments[0].click();", next_btn)
                 time.sleep(2)
                 self.scroll_until_review_loaded(scroll_count=3)
                 page += 1
             except Exception as e:
-                print(f"❌ 다음 페이지 이동 실패: {e}")
+                print(f"다음 페이지 이동 실패: {e}")
                 break
 
         self.driver.quit()
         self.reviews = values
 
-
     def save_to_database(self):
         if not hasattr(self, 'reviews') or not self.reviews:
-            print("⚠️ 저장할 리뷰가 없습니다.")
+            print("저장할 리뷰가 없습니다.")
             return
 
         df = pd.DataFrame(self.reviews, columns=['date', 'rate', 'review'])

@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
+from typing import Any
 import time
 import csv
 import os
@@ -26,7 +27,7 @@ class NaverCrawler(BaseCrawler):
     def __init__(self, output_dir: str):
         super().__init__(output_dir)
         self.url = "https://brand.naver.com/cocacola/products/4624572909"
-        self.reviews = []
+        self.reviews: list[Any] = []
 
     def start_browser(self):
         """
@@ -69,7 +70,7 @@ class NaverCrawler(BaseCrawler):
         current_page = 1
 
         while len(self.reviews) < 500:
-            print(f"📄 {current_page} 페이지 크롤링 중...")
+            print(f"{current_page} 페이지 크롤링 중...")
 
             # 스크롤해서 리뷰 로드 (한 페이지 내에서 전체 리뷰 로드)
             for _ in range(20):
@@ -107,7 +108,7 @@ class NaverCrawler(BaseCrawler):
                     content = groups[i][-2]
                     self.reviews.append([date, star, content])
                 except Exception as e:
-                    print(f"❌ 리뷰 {i} 파싱 실패:", e)
+                    print(f"리뷰 {i} 파싱 실패:", e)
 
                     # 500개 모았으면 종료
                     if len(self.reviews) >= 500:
@@ -131,7 +132,7 @@ class NaverCrawler(BaseCrawler):
                     current_page += 1
                     time.sleep(3)
             except Exception as e:
-                print("✅ 마지막 페이지거나 '다음' 버튼 없음:", e)
+                print("마지막 페이지거나 '다음' 버튼 없음:", e)
                 break
 
         self.driver.quit()
@@ -153,5 +154,5 @@ class NaverCrawler(BaseCrawler):
             writer.writerow(["날짜", "별점", "리뷰"])
             writer.writerows(self.reviews)
 
-        print(f"✅ {len(self.reviews)}개 리뷰 저장 완료: {output_path}")
+        print(f"{len(self.reviews)}개 리뷰 저장 완료: {output_path}")
 
