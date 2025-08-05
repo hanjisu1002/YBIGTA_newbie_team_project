@@ -1,0 +1,15 @@
+# MySQL Configuration
+# MYSQL_HOST=localhost  # docker-compose 쓸 경우 db
+MYSQL_HOST=mysql # 컨테이너 이름 
+MYSQL_PORT=3306
+MYSQL_USER=root  # 또는 지정한 사용자명
+MYSQL_PASSWORD=yourpass
+MYSQL_DB=yourdbname
+
+# MongoDB Configuration
+MONGODB_URI=mongodb://localhost:27017/
+MONGODB_DB=yourmongodbname
+
+# FastAPI
+PORT=8000
+TZ=Asia/Seoul
