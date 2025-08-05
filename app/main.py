@@ -5,8 +5,12 @@ import os
 
 from app.user.user_router import user
 from app.config import PORT
+from database.mysql_connection import Base, engine
 
 app = FastAPI()
+
+Base.metadata.create_all(bind=engine)
+
 static_path = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/static", StaticFiles(directory=static_path), name="static")
 
