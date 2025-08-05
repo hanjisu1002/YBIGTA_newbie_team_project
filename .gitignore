@@ -209,3 +209,21 @@ __marimo__/
 
 # macOS Finder
 .DS_Store
+
+# tfidf JSON 파일 무시
+tfidf_naver.json
+tfidf_emart.json
+tfidf_lotteon.json
+
+# 환경 변수
+.env
+
+# Python 캐시 파일
+__pycache__/
+*.py[cod]
+
+# SQLite DB 파일
+*.sqlite3
+
+# 기타
+*.log

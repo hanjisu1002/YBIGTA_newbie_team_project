@@ -39,20 +39,20 @@ if __name__ == "__main__":
     os.makedirs(args.output_dir, exist_ok=True)
 
     if args.all: 
-        print("✅ 전체 데이터 전처리 시작") 
+        print("전체 데이터 전처리 시작") 
         for csv_file in REVIEW_COLLECTIONS:
             base_name = os.path.splitext(os.path.basename(csv_file))[0]
-            print(f"📄 현재 파일: {base_name}") 
+            print(f"현재 파일: {base_name}") 
             for key in PREPROCESS_CLASSES.keys():
                 if base_name.startswith(key):  
-                    print(f"🔧 처리 시작: {key}") 
+                    print(f"처리 시작: {key}") 
                     preprocessor_class = PREPROCESS_CLASSES[key]
                     preprocessor = preprocessor_class(csv_file, args.output_dir)
                     preprocessor.preprocess()
-                    print(f"✅ preprocess 완료: {csv_file}")
+                    print(f"preprocess 완료: {csv_file}")
                     preprocessor.feature_engineering()
-                    print(f"✅ feature_engineering 완료: {csv_file}")
+                    print(f"feature_engineering 완료: {csv_file}")
                     preprocessor.save_to_database()
-                    print(f"✅ 저장 완료: {csv_file}")
+                    print(f"저장 완료: {csv_file}")
                     break
 

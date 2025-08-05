@@ -14,7 +14,6 @@ import csv
 class EmartCrawler(BaseCrawler):
     """
     Emart 상품 리뷰를 크롤링하는 클래스.
-
     SSG.COM 내 Emart 상품 페이지에서 Selenium과 BeautifulSoup을 활용해
     날짜, 평점, 리뷰 텍스트를 수집하고 CSV로 저장합니다.
 
@@ -27,7 +26,7 @@ class EmartCrawler(BaseCrawler):
 
     def __init__(self, output_dir: str, max_page: int = 50):
         super().__init__(output_dir)
-        self.url = "https://emart.ssg.com/item/itemView.ssg?itemId=1000529473806&siteNo=6001&ckwhere=danawa&appPopYn=n&utm_medium=PCS&utm_source=danawa&utm_campaign=danawa_pcs&service_id=estimatedn"
+        self.url = "https://emart.ssg.com/item/itemView.ssg?itemId=1000529473806&siteNo=6001&ckwhere=danawa&appPopYn=n&utm_medium=PCS&utm_source=danawa&utm_campaign=danawa_pcs&service_id=estimatedn"  
         self.max_page = max_page
         self.columns = ['date', 'rate', 'review']
         self.values: list[list[str]] = []

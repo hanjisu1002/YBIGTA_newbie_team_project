@@ -114,12 +114,6 @@ IndexError: list index out of range
 - 별점: em
 - 리뷰: p.rvw_item_text
 
-### 크롤링 실행 예시
-
-```bash
-PYTHONPATH=../../ python main.py -c emart -o ../../database
-```
-
 ### 크롤링 중 발생할 수 있는 이슈
 
 - Emart 리뷰는 JS 기반 페이지 호출 구조로 되어 있어, 페이지 로딩 지연 또는 함수 호출 실패 시 크롤링이 중단될 수 있습니다.
@@ -137,13 +131,27 @@ PYTHONPATH=../../ python main.py -c emart -o ../../database
 1. 데이터 불러오기 및 구조 정리
    플랫폼마다 저장 포맷이 달라, CSV 구조를 통일하는 작업이 필요했습니다.
    특히 Naver 데이터의 경우 비정상적인 형식과 누락된 정보가 많아, 헤더 통일 및 필드 정제를 우선 수행했습니다.
+   개별 csv를 전처리 하기 전 단계에서 EDA를 수행할 때 세 파일을 모두 진행하고자 하였으나, naver의 경우 저장 포맷이 나머지 두 사이트와 다르고
+   리뷰 순서가 추천순으로 기본설정이 되어있는 다른 사이트와 달리 최신순으로 설정이 되어 2021-2025로 분포가 일정하지 않고 2025 06-07월에 밀집되어 부득이하게 전처리 이후에만 분석에 적용하였습니다.
 
 2. 별점(Rating) 분포 분석 및 확인
    전체 데이터를 기준으로 별점 분포를 시각화한 결과, 5점과 4점에 리뷰가 편중된 양상을 보였습니다.
-   이상치로 보이는 별점은 확인되지 않았습니다.
-   사이트별 별점 분포 역시 유사한 경향을 보였습니다.
+   데이터 상에서 1.0-5.0를 벗어나거나 소숫점으로 나타나는 등의 이상치로 보이는 별점은 확인되지 않았습니다.
+   사이트별 별점 분포 역시 각 사이트에서 유사한 경향을 보였습니다.
 
-3. 날짜(Date) 분포 및 전처리
+### 결측치 및 이상치 처리
+
+리뷰 텍스트 없음 → "" (빈 문자열)로 처리
+날짜 파싱 실패 → NaT 처리
+이 부분은 크롤링 단계에서 날짜, 평점, 리뷰를 모두 갖춘 element만 크롤링 하도록 구현하였습니다.
+각 사이트 별 크롤링 과정 설명에서 설명해 두었습니다!
+
+이후 이상치 처리 과정에서는
+리뷰 길이 200자 이상 → 이상치로 간주, 시각화 통해 확인 후 의미 단위로 글자 수를 초과하는 뒷 부분을 삭제하였습니다.
+
+이러한 과정들을 통해 리뷰 데이터셋을 시각적으로 탐색하고, 의미 없는 정보와 오류 데이터를 제거하여 모델 학습과 분석이 가능한 정제된 리뷰 데이터셋을 구축했습니다.
+
+### 날짜(Date) 분포 및 전처리
 
 (1) 날짜 전처리
 다양한 날짜 포맷(예: 23.01.01, 2023-01-01, 2023.1.1.)이 혼재되어 있어, yy-mm-dd 형식으로 통일했습니다.
@@ -154,50 +162,29 @@ return dt.strftime("%y-%m-%d")
 
 (2) 월별 리뷰 수 시각화
 전체 월별 리뷰 수는 아래와 같으며, 특정 시기에 리뷰가 집중되어 있음을 확인할 수 있습니다.
+
 ![사이트 통합 월별 리뷰 수](review_analysis/plots/bar_by_month_all.png)
 ![사이트 별 월별 리뷰 수](review_analysis/plots/bar_by_month_site.png)
+
 Emart와 LotteON 별로 보면, Emart는 특정 시점에 집중적으로 리뷰가 작성되었고, LotteON은 비교적 고르게 분포되어 있습니다.
-
-### 결측치 및 이상치 처리 -> 크롤링 당시에 처리
-
-리뷰 텍스트 없음 → "" (빈 문자열)로 처리
-
-날짜 파싱 실패 → NaT 처리
-
-리뷰 길이 200자 이상 → 이상치로 간주, 시각화 통해 확인 후 필요시 제거
-
-이러한 과정들을 통해 리뷰 데이터셋을 시각적으로 탐색하고, 의미 없는 정보와 오류 데이터를 제거하여 모델 학습과 분석이 가능한 정제된 리뷰 데이터셋을 구축했습니다.
 
 ### 텍스트 데이터 전처리 (리뷰 텍스트 정제)
 
 전처리 내용 (clean_review() 기준)
 
 - 줄바꿈 문자 제거: \n, \r 제거
-
 - 특수기호 제거: 정규표현식으로 한글, 영문, 숫자, 문장부호 제외 문자 제거
-
 - 중복 문자 축약: (예) 좋아아아 → 좋아아
-
 - 단독 자음/모음 제거: ㄱ, ㅏ 등 제거
-
 - 공백 정리: strip() 사용
-
 - 텍스트 길이 자르기: truncate_review() 함수로 80~100자 사이로 잘림
 
 - 리뷰 길이 분석 및 이상치 탐지
-
   전체 리뷰 텍스트의 길이를 박스플롯(Box Plot) 으로 시각화한 결과, 대부분 40~100자 사이에 집중되며, 200자 이상은 이상치로 판단됩니다.
   ![전체 리뷰 텍스트 길이](review_analysis/plots/boxplot_all.png)
 
   사이트별로 보면 Emart와 LotteON 모두 유사한 분포를 보입니다.
   ![사이트별 리뷰 텍스트 길이](review_analysis/plots/boxplot_by_site.png)
-
-### 파생 변수 생성 (요일(Weekday))
-
-날짜 데이터를 기반으로 리뷰가 작성된 요일을 추출했습니다.
-
-self.df['weekday'] = pd.to_datetime(self.df['date'], format="%y-%m-%d", errors='coerce').dt.day_name()
-이는 요일별 사용자 리뷰 패턴 분석에 활용됩니다.
 
 ### 텍스트 벡터화 (feature_engineering(self))
 
@@ -222,11 +209,17 @@ tokenizer=normalize_korean_text,
 위 코드를 이용하여 어휘 목록에 있는 의미가 겹치는 단어들을 정제하려고 하였으나 패키지 설치가 복잡하여 채점 시 오류를 발생시키는 빈도가 높아 제거했습니다.
 이를 적용한다면 형태소를 분석하고 어간만 추출하여 의미적 정확도를 높이고 차원을 줄일 수 있습니다.
 
-#### TF-IDF 방식
+- TF-IDF 방식
+  mean_tfidf = tfidf_df.mean().sort_values(ascending=False).head(top_n)
+  TF-IDF 점수는 문서별 단어 중요도를 나타내는데, 각 플랫폼별 리뷰 전체에 대해 단어별 평균 TF-IDF를 계산하였습니다.
+  이를 이용해 아래 텍스트 비교 분석 파트에서 시각화와 함께 세 플랫폼에서 나타나는 리뷰의 특징을 분석해보았습니다.
 
-mean_tfidf = tfidf_df.mean().sort_values(ascending=False).head(top_n)
-TF-IDF 점수는 문서별 단어 중요도를 나타내는데, 각 플랫폼별 리뷰 전체에 대해 단어별 평균 TF-IDF를 계산하였습니다.
-이를 이용해 아래 텍스트 비교 분석 파트에서 시각화와 함께 세 플랫폼에서 나타나는 리뷰의 특징을 분석해보았습니다.
+### 파생 변수 생성 (요일(Weekday))
+
+날짜 데이터를 기반으로 리뷰가 작성된 요일을 추출했습니다.
+
+self.df['weekday'] = pd.to_datetime(self.df['date'], format="%y-%m-%d", errors='coerce').dt.day_name()
+이는 요일별 사용자 리뷰 패턴 분석에 활용됩니다.
 
 ## 비교 분석
 
@@ -281,7 +274,7 @@ Emart는 화요일, LotteON과 Naver는 수요일에 리뷰가 다소 집중되�
 ![사이트별 월별 평균 별점](review_analysis/plots/rating_distribution_by_site.png)
 ![전체 월별 평균 별점](review_analysis/plots/rating_distribution_by_site_total.png)
 
-전반적으로 세 플랫폼 모두 높은 평점(4.5-5.0)을 유지하고 있으며, 일부 낮은 평점(13점)도 존재하나 빈도는 적었습니다.
+전반적으로 세 플랫폼 모두 높은 평점(4.5-5.0)을 유지하고 있으며, 일부 낮은 평점(1,3점)도 존재하나 빈도는 적었습니다.
 특히 LotteON의 경우, 리뷰를 추천순으로 정렬한 상위 500개만 수집했기 때문에, 긍정적인 평가 위주로 편향되어 있을 가능성이 높습니다.
 상품 자체가 대체로 특가 상품으로 판매되며, 대량 구매가 잦고 상품에 대한 기대치가 명확한 만큼 평점이 높게 나타나는 경향이 있는 것으로 분석됩니다.
 
@@ -291,38 +284,77 @@ Emart는 화요일, LotteON과 Naver는 수요일에 리뷰가 다소 집중되�
 
 ### branch_protection.png
 
-![branch_protection](branch_protection.png)
+![branch_protection](github/branch_protection.png)
 
 ### push_rejected.png
 
-![push_rejected](push_rejected.png)
+![push_rejected](github/push_rejected.png)
 
 ### review_and_merged
 
-![review_and_merged](review_and_merged.png)
+![review_and_merged](github/review_and_merged.png)
 
 ## 팀원 소개
 
-안녕하세요 저희 팀은 팀장 한지수, 팀원 구남혁, 강예서로 이루어져있습니다. 저희는 키워드로 자기소개를 해보았습니다.
+안녕하세요 저희 팀은 팀장 한지수, 팀원 구남혁, 강예서로 이루어져있습니다. 저희는 키워드를 이용하여 자기소개를 해보았습니다.
 
 한지수(03)
 인공지능학과 23학번
-
 \#팀장 \#ENTJ \#DS \#보컬\_밴드
+저는 이번 신입 기수 팀프로젝트에서 팀장을 맡고 있으며, mbti는 항상 바뀌지만 NT성향이 강한 것 같습니다.
+DS팀에 들어가고 싶어서 YBIGTA에 지원하였지만, 인공지능 외에 다른 분야도 경험해보고 싶습니다.
+인공지능학과 밴드에서 보컬로 몇 번 공연을 했었는데, 그래서 노래방 가는 걸 매우 좋아하니 언제든 불러주세요!
 
 구남혁(03)
 응용통계학과 22학번
-
-\# ESFJ \# DA팀 \# 축구
+\# ESFJ \# DA팀 \#센터백\_축구
+안녕하세요 응용통계학과 22학번 구남혁입니다. 데이터 분석에 관심이 있어서 DA팀에 지원했고, 관심사는 금융권입니다. 그래서 나중에 금융권에 관심 있는 분들과 함께 관련 프로젝트를 한 번 해보고 싶습니다.
+저는 위스키라는 독특한 취미를 가지고 있는데 혹시 같은 취미를 가지신 분이 있다면 나중에 같이 위스키 마시면 좋을 것 같아요!
 
 강예서(04)
 경영학과 23학번
-
 \# ISFP \#DA팀 \#일렉\_밴드
+안녕하세요!! 저는 데이터를 활용한 마케팅에 관심이 있어서 YBIGTA에 DA팀으로 들어오게 되었습니다. 세션을 들으며 열심히 공부하여 프로젝트에서도 잘 활약하고 싶습니다!
+올해 들어 일렉을 배우기 시작해서 요즘 남는 시간에는 일렉 연습을 하면서 보내고 있습니다. 혹시 또 일렉을 하시는 분이 계시다면 반갑게 인사해주세요:)
 
-## 실행 방법
+## WEB, 크롤링, EDA/FE 과제 실행 방법
 
-### 크롤러 실행
+### 코드 실행 방법
+
+### WEB 과제
+
+- fastAPI 앱(서버) 실행
+  YBIGTA_newbie_team_project directory 기준
+  uvicorn app.main:app --reload 를 terminal에서 실행한 후
+  http://127.0.0.1:8000/docs 에 접속하여 기능 구현 여부를 확인하실 수 있습니다.
+
+- index.html 실행
+  app/static directory 기준
+  python3 -m http.server 8000 을 terminal에서 실행한 후
+  http://localhost:8000/index.html 에 접속하여 디자인 구현 여부를 확인하실 수 있습니다.
+
+### pytest, mypy test
+
+YBIGTA_newbie_team_project directory 에서
+
+- pytest
+  pip install pytest 이용하여 설치 후
+  pytest . 실행
+
+- mypy
+  pip install mypy 이용하여 설치 후
+  mypy . 실행
+
+코드 구현 부분 외에 module import하는 과정에서 mypy error가 발생하였는데, 이러한 이유가 발생하는 이유를 https://mypy.readthedocs.io/en/stable/error_code_list.html에서 찾아보았습니다.
+
+mypy는 정적 타입 검사기인데, 서드파티 라이브러리들은 타입 힌트를 제공하지 않거나, .pyi 스텁 파일이 없는 경우가 있다고 합니다.
+따라서 cv2, matplotlib, selenium, fastapi 등의 라이브러리들을 import할 때
+error: Skipping analyzing "cv2": module is installed, but missing library stubs or py.typed marker
+와 같은 에러가 발생하며 타입 검사를 할 수 없어 에러가 발생했습니다.
+
+mypy test를 수행하여 확인하고 싶은 것이 작성된 코드가 정해진 타입대로 동작하는지를 확인하는 것이라고 이해하였는데, 모듈의 설치 여부나 라이브러리의 타입 힌트 존재 여부가 코드의 동작여부 판단에 영향을 미치지 않을 것이라고 생각하여 불필요한 에러를 방지하기 위해 mypy.ini 파일을 이용해 라이브러리 import 부분의 에러만을 고려하지 않도록 설정하였습니다.
+
+### 크롤링 과제
 
 ```bash
 특정 크롤러 실행
@@ -343,8 +375,8 @@ PYTHONPATH=. python review_analysis/crawling/main.py -o review_analysis/output -
 
 ```bash
 review_analysis directory 기준,
-PYTHONPATH=.. python preprocessing/main.py
+PYTHONPATH=.. python preprocessing/main.py --all -o ../database
 ```
 
-를 실행하면 preprocessed*reviewes*{key}.csv 에 해당하는 csv 파일 세 개가 생성됩니다.
-각 csv 파일은 전처리된 날짜, 별점, 리뷰, 요일(date, rate, review, weekday)로 구성되어 있습니다.
+를 실행하면 database 폴더에 preprocessed*reviewes*{key}.csv 에 해당하는 csv 파일 세 개와 tfidf\_{key}.json 세 개가 생성됩니다.
+각 csv 파일은 전처리된 날짜, 별점, 리뷰, 요일(date, rate, review, weekday)로 구성되어 있고, json 파일은 벡터화 된 단어들의 tf-idf 점수를 보여줍니다.
