@@ -1,0 +1,15 @@
+# Database Configuration
+DB_HOST=db
+DB_PORT=5432
+DB_NAME=tododb
+DB_USER=todouser
+DB_PASSWORD=todopass
+
+# PostgreSQL Configuration
+POSTGRES_USER=todouser
+POSTGRES_PASSWORD=todopass
+POSTGRES_DB=tododb
+
+# Application Configuration
+PORT=5000
+TZ=Asia/Seoul 
