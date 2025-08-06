@@ -1,4 +1,4 @@
-from database.mysql_connection import engine, Base
+from database.mysql_connection import engine, Base, DB_URL
 from app.user.user_repository import User  # SQLAlchemy 모델 import
 
 def create_tables():
@@ -8,3 +8,6 @@ def create_tables():
 
 if __name__ == "__main__":
     create_tables() 
+
+
+print("🔍 현재 연결된 DB 주소:", DB_URL)
