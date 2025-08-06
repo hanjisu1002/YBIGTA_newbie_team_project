@@ -1,28 +1,58 @@
-import json
+from typing import Optional
+from sqlalchemy.orm import Session
+from sqlalchemy import Column, String
+from database.mysql_connection import Base
+from app.user.user_schema import User as UserSchema  # Pydantic 모델
 
-from typing import Dict, Optional
 
-from app.user.user_schema import User
-from app.config import USER_DATA
+# SQLAlchemy ORM 모델
+class User(Base):
+    __tablename__ = "users"
+    __table_args__ = {'extend_existing': True}
 
+    email = Column(String(100), primary_key=True, index=True)
+    username = Column(String(50))  # ✅ 필드명 username으로 맞춤
+    password = Column(String(100))
+
+
+# Repository 클래스
 class UserRepository:
     def __init__(self, db: Session):
         self.db = db
 
     def get_user_by_email(self, email: str) -> Optional[UserSchema]:
         user = self.db.query(User).filter(User.email == email).first()
-        return UserSchema(**user.__dict__) if user else None
+        if user:
+            return UserSchema(
+                email=user.email,
+                username=user.username,
+                password=user.password
+            )
+        return None
 
-    def save_user(self, user: User) -> User: 
-        self.users[user.email] = user.model_dump() # 새로운 user 정보를 dict로 저장 (기존 이메일이면 덮어쓰기) : add or overwrite
-        # 새로운 유저면(이메일이 self.users에 없으면) new key 저장
-        # 기존 유저면(같은 이메일이 존재) key의 value 덮어씀
-        with open(USER_DATA, "w") as f:
-            json.dump(self.users, f) # 전체 users를 파일에 다시 저장 (갱신)
-        return user
+    def save_user(self, user_data: UserSchema) -> UserSchema:
+        existing_user = self.db.query(User).filter(User.email == user_data.email).first()
+        if existing_user:
+            existing_user.username = user_data.username
+            existing_user.password = user_data.password
+        else:
+            user = User(
+                email=user_data.email,
+                username=user_data.username,
+                password=user_data.password
+            )
+            self.db.add(user)
 
-    def delete_user(self, user: User) -> User:
-        del self.users[user.email] # 해당 이메일 key 삭제
-        with open(USER_DATA, "w") as f:
-            json.dump(self.users, f) # 변경사항 저장
-        return user
+        self.db.commit()
+        return UserSchema(
+            email=user_data.email,
+            username=user_data.username,
+            password=user_data.password
+        )
+
+    def delete_user(self, user_data: UserSchema) -> UserSchema:
+        user = self.db.query(User).filter(User.email == user_data.email).first()
+        if user:
+            self.db.delete(user)
+            self.db.commit()
+        return user_data

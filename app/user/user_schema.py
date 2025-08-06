@@ -6,6 +6,9 @@ class User(BaseModel):
     password: str
     username: str
 
+    class Config:
+        orm_mode = True 
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
@@ -19,4 +22,6 @@ class UserDeleteRequest(BaseModel):
 
 class MessageResponse(BaseModel):
     message: str
+
+
 
