@@ -2,6 +2,8 @@
 services:
   mysql:
     image: mysql:8.0
+    env_file:
+      - .env
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${passwd}
@@ -16,10 +18,9 @@ services:
   mongodb:
     image: mongo:6.0
     container_name: mongodb
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    env_file:
+      - .env
+
     command: ["--bind_ip_all"]
     ports:
       - "27017:27017"

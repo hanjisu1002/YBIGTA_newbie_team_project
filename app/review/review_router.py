@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Path
 from typing import Dict, Type, cast
 from database.mongodb_connection import mongo_db
 from pydantic import BaseModel
@@ -18,7 +18,8 @@ PREPROCESS_CLASSES: Dict[str, Type[BaseDataProcessor]] = {
 router = APIRouter()
 
 @router.post("/review/preprocess/{site_name}")
-def preprocess_review(site_name: str):
+def preprocess_review(site_name: str = Path(..., description="사이트 이름 (예: reviews_naver, reviews_emart, reviews_lotteon)")
+):
     if site_name not in PREPROCESS_CLASSES:
         raise HTTPException(status_code=400, detail="Unknown site_name")
 

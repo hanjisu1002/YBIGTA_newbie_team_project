@@ -2,16 +2,17 @@ import json
 
 from typing import Dict, Optional
 
-from app.user.user_schema import User
-from app.config import USER_DATA
+from user.user_schema import User
+from config import USER_DATA
 from sqlalchemy.orm import Session
 from sqlalchemy import Column, String
 from database.mysql_connection import Base
-from app.user.user_schema import User as UserSchema  # Pydantic
+from user.user_schema import User as UserSchema  # Pydantic
 from typing import Optional
 
 class User(Base):
     __tablename__ = "users"
+    __table_args__ = {"extend_existing": True}
 
     email = Column(String(100), primary_key=True, index=True)
     username = Column(String(50))

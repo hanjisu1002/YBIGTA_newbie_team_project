@@ -2,7 +2,8 @@ from fastapi import Depends
 from app.user.user_repository import UserRepository
 from app.user.user_service import UserService
 from sqlalchemy.orm import Session
-from database.mysql_connection import Base
+from database.mysql_connection import Base, SessionLocal
+
 
 
 def get_db():
