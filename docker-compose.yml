@@ -31,6 +31,8 @@ services:
 
   app:
     image: hanjisu1002/project-backend:latest
+    env_file:
+      - .env
     container_name: app
     ports:
       - "8000:8000"
@@ -41,9 +43,10 @@ services:
       - MYSQL_HOST=${host}
       - MYSQL_PORT=${port}
       - MYSQL_USER=${user}
-      - MYSQL_PASSWORD=${passwdD}
+      - MYSQL_PASSWORD=${passwd}
       - MYSQL_DB=${db}
       - MONGODB_URL=${MONGODB_URL}
+    
     networks:
       - app-network
 
