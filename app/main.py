@@ -2,9 +2,9 @@ import app
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from user.user_router import user
+from app.user.user_router import user
 from app.config import PORT
-from review.review_router import router as review_router
+from app.review.review_router import router as review_router
 
 app = FastAPI()
 

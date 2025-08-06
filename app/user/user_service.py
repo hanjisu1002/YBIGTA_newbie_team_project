@@ -1,5 +1,5 @@
-from user.user_repository import UserRepository
-from user.user_schema import User, UserLogin, UserUpdate
+from app.user.user_repository import UserRepository
+from app.user.user_schema import User, UserLogin, UserUpdate
 
 class UserService:
     def __init__(self, userRepoitory: UserRepository) -> None:
