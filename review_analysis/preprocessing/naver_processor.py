@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+os.chdir(r'C:\Users\0723a\Desktop\YBIGTA\여름 방학 세션\YBIGTA_newbie_team_project-2')
 import re
 import json
 from datetime import datetime
@@ -118,3 +119,4 @@ class NaverProcessor(BaseDataProcessor):
             print(f"MongoDB에 {len(result.inserted_ids)}개 문서 저장 완료: {collection_name}")
         else:
             print("저장할 데이터가 없습니다.")
+
