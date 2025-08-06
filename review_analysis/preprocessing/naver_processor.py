@@ -3,13 +3,19 @@ import os
 import re
 import json
 from datetime import datetime
+from database.mongodb_connection import mongo_db
 from review_analysis.preprocessing.base_processor import BaseDataProcessor
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 class NaverProcessor(BaseDataProcessor):
-    def __init__(self, input_path: str, output_path: str):
-        super().__init__(input_path, output_path)
-        self.df = pd.read_csv(self.input_path)
+    def __init__(self, collection_name: str, output_dir: str):
+        super().__init__(input_path=None, output_dir=output_dir)
+        
+        # MongoDB에서 데이터 읽기
+        cursor = mongo_db[collection_name].find({})
+        data_list = list(cursor)
+        self.df = pd.DataFrame(data_list)
+        self.collection_name = collection_name  # 멤버 변수로 저장
 
     def preprocess(self):
         self.df.columns = self.df.columns.str.strip()
@@ -73,15 +79,12 @@ class NaverProcessor(BaseDataProcessor):
         # 리뷰 전처리
         self.df["review"] = self.df["review"].apply(clean_review)
 
-        # 날짜 변환
+        # 날짜 변환 (중복 호출 제거 가능하지만 유지)
         self.df["date"] = self.df["date"].apply(convert_date)
 
-       
-
     def feature_engineering(self):
-         # 날짜 처리 및 요일 파생 변수 생성
+        # 날짜 처리 및 요일 파생 변수 생성
         self.df['weekday'] = pd.to_datetime(self.df['date'], format="%y-%m-%d", errors='coerce').dt.day_name()
-
 
         # TF-IDF 벡터화
         vectorizer = TfidfVectorizer(
@@ -91,36 +94,28 @@ class NaverProcessor(BaseDataProcessor):
         )
         tfidf_matrix = vectorizer.fit_transform(self.df["review"])
 
-        # 저장을 위해 DataFrame으로 변환
+        # DataFrame 변환
         tfidf_df = pd.DataFrame(tfidf_matrix.toarray(), columns=vectorizer.get_feature_names_out())
 
-
-        # 저장을 위해 보관
+        # 저장용 보관
         self.vectorizer = vectorizer
         self.tfidf_matrix = tfidf_matrix
         self.tfidf_df = tfidf_df
-    
+
     def save_to_database(self):
-        # 사이트 이름 결정
-        if "naver" in self.input_path:
-            site_name = "naver"
-        elif "emart" in self.input_path:
-            site_name = "emart"
-        elif "lotteon" in self.input_path:
-            site_name = "lotteon"
+        if hasattr(self, "df") and not self.df.empty:
+            collection_name = getattr(self, "collection_name", None)
+            if collection_name is None:
+                collection_name = "reviews_emart"
+
+            collection = mongo_db[collection_name]
+
+            # 기존 데이터 삭제 (옵션)
+            collection.delete_many({})
+
+            # DataFrame을 딕셔너리 리스트로 변환하여 삽입
+            data_list = self.df.to_dict(orient="records")
+            result = collection.insert_many(data_list)
+            print(f"MongoDB에 {len(result.inserted_ids)}개 문서 저장 완료: {collection_name}")
         else:
-            raise ValueError("Unknown site in input_path")
-
-        # CSV 저장
-        filename = f"preprocessed_reviews_{site_name}.csv"
-        save_path = os.path.join(self.output_dir, filename)
-        self.df.to_csv(save_path, index=False)
-        print(f"✅ CSV 저장 완료: {save_path}")
-
-        # TF-IDF가 존재하는 경우 JSON으로 저장
-        if hasattr(self, "vectorizer") and hasattr(self, "tfidf_matrix"):
-            tfidf_json = self.tfidf_df.to_dict(orient="records")
-            json_path = os.path.join(self.output_dir, f"tfidf_{site_name}.json")
-            with open(json_path, "w", encoding="utf-8") as f:
-                json.dump(tfidf_json, f, ensure_ascii=False, indent=2)
-            print(f"TF-IDF JSON 저장 완료: {json_path}")
+            print("저장할 데이터가 없습니다.")

@@ -2,20 +2,20 @@ import json
 
 from typing import Dict, Optional
 
-from user.user_schema import User
-from config import USER_DATA
+from app.user.user_schema import User
+from app.config import USER_DATA
 from sqlalchemy.orm import Session
 from sqlalchemy import Column, String
 from database.mysql_connection import Base
-from user.user_schema import User as UserSchema  # Pydantic
+from app.user.user_schema import User as UserSchema  # Pydantic
 from typing import Optional
 
 class User(Base):
     __tablename__ = "users"
-    __table_args__ = {"extend_existing": True}
+    __table_args__ = {'extend_existing': True}
 
     email = Column(String(100), primary_key=True, index=True)
-    username = Column(String(50))
+    name = Column(String(50))  # username -> name으로 변경
     password = Column(String(100))
 
 
@@ -30,10 +30,10 @@ class UserRepository:
     def save_user(self, user_data: UserSchema) -> UserSchema:
         existing_user = self.db.query(User).filter(User.email == user_data.email).first()
         if existing_user:
-            existing_user.username = user_data.username
+            existing_user.name = user_data.username  # username -> name으로 변경
             existing_user.password = user_data.password
         else:
-            user = User(**user_data.model_dump())
+            user = User(email=user_data.email, name=user_data.username, password=user_data.password)  # username -> name으로 변경
             self.db.add(user)
 
         self.db.commit()

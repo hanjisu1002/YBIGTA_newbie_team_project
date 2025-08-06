@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 from database.mysql_connection import Base, SessionLocal
 
 
-
 def get_db():
     db = SessionLocal()
     try:
