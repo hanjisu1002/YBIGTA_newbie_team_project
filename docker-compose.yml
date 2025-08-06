@@ -30,7 +30,7 @@ services:
       - app-network
 
   app:
-    image: hanjisu1002/ybigta-teamproject:latest
+    image: hanjisu1002/ybigta-teamproject2:amd64
     env_file:
       - .env
     container_name: app
