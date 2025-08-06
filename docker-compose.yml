@@ -1,0 +1,59 @@
+
+services:
+  mysql:
+    image: mysql:8.0
+    env_file:
+      - .env
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${passwd}
+      MYSQL_DATABASE: ${db}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    env_file:
+      - .env
+
+    command: ["--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+  app:
+    image: hanjisu1002/ybigta-teamproject:latest
+    env_file:
+      - .env
+    container_name: app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+      - mongodb
+    environment:
+      - MYSQL_HOST=${host}
+      - MYSQL_PORT=${port}
+      - MYSQL_USER=${user}
+      - MYSQL_PASSWORD=${passwd}
+      - MYSQL_DB=${db}
+      - MONGODB_URL=${MONGODB_URL}
+    
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:
+  mongodb_data:
+
+networks:
+  app-network:
+    driver: bridge 

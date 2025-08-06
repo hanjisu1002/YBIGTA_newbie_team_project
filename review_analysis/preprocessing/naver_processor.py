@@ -119,3 +119,4 @@ class NaverProcessor(BaseDataProcessor):
             print(f"MongoDB에 {len(result.inserted_ids)}개 문서 저장 완료: {collection_name}")
         else:
             print("저장할 데이터가 없습니다.")
+
