@@ -26,12 +26,6 @@ class UserRepository:
         user = self.db.query(User).filter(User.email == email).first()
         return UserSchema(**user.__dict__) if user else None
 
-    # def save_user(self, user_data: UserSchema) -> UserSchema:
-    #     user = User(**user_data.model_dump())
-    #     self.db.add(user)
-    #     self.db.commit()
-    #     self.db.refresh(user)
-    #     return UserSchema(**user.__dict__)
     def save_user(self, user_data: UserSchema) -> UserSchema:
         existing_user = self.db.query(User).filter(User.email == user_data.email).first()
         if existing_user:
