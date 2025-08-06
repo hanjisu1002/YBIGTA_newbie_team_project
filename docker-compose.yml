@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   mysql:
@@ -30,7 +29,7 @@ services:
       - app-network
 
   app:
-    image: hanjisu1002/project-backend:latest
+    image: hanjisu1002/ybigta-teamproject:latest
     env_file:
       - .env
     container_name: app
