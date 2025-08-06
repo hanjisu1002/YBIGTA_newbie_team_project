@@ -5,8 +5,8 @@ services:
     image: mysql:8.0
     container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_ROOT_PASSWORD: ${passwd}
+      MYSQL_DATABASE: ${db}
     ports:
       - "3306:3306"
     volumes:
@@ -38,11 +38,11 @@ services:
       - mysql
       - mongodb
     environment:
-      - MYSQL_HOST=${MYSQL_HOST}
-      - MYSQL_PORT=${MYSQL_PORT}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_DB=${MYSQL_DB}
+      - MYSQL_HOST=${host}
+      - MYSQL_PORT=${port}
+      - MYSQL_USER=${user}
+      - MYSQL_PASSWORD=${passwdD}
+      - MYSQL_DB=${db}
       - MONGODB_URL=${MONGODB_URL}
     networks:
       - app-network
