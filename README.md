@@ -391,3 +391,4 @@ PYTHONPATH=.. python preprocessing/main.py --all -o ../database
 ![preprocess_emart](aws/preprocess_emart.png)
 ![preprocess_lotteon](aws/preprocess_lotteon.png)
 ![preprocess_naver](aws/preprocess_naver.png)
+![github_action](aws/github_action.png)
