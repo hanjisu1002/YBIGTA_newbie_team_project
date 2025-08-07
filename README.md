@@ -382,13 +382,13 @@ PYTHONPATH=.. python preprocessing/main.py --all -o ../database
 
 각 csv 파일은 전처리된 날짜, 별점, 리뷰, 요일(date, rate, review, weekday)로 구성되어 있고, json 파일은 벡터화 된 단어들의 tf-idf 점수를 보여줍니다.
 
-
 # 4. AWS DB Docker 과제
- ![delete](github/delete.png)
- ![login](github/login.png)
- ![register](github/register.png)
- ![update_password](github/update_password.png)
- ![preprocess_emart](github/preprocess_emart.png)
- ![preprocess_lotteon](github/preprocess_lotteon.png)
- ![preprocess_naver](github/preprocess_naver.png)
- ![github_action](github/github_action.png)
+
+![delete](aws/delete.png)
+![login](awd/login.png)
+![register](awd/register.png)
+![update_password](aws/update_password.png)
+![preprocess_emart](aws/preprocess_emart.png)
+![preprocess_lotteon](aws/preprocess_lotteon.png)
+![preprocess_naver](aws/preprocess_naver.png)
+![github_action](aws/github_action.png)
