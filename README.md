@@ -382,6 +382,7 @@ PYTHONPATH=.. python preprocessing/main.py --all -o ../database
 
 각 csv 파일은 전처리된 날짜, 별점, 리뷰, 요일(date, rate, review, weekday)로 구성되어 있고, json 파일은 벡터화 된 단어들의 tf-idf 점수를 보여줍니다.
 
+
 # 4. AWS DB Docker 과제
  ![delete](github/delete.png)
  ![login](github/login.png)
