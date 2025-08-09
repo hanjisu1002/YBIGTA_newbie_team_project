@@ -1,0 +1,65 @@
+[
+	{
+		"id": "coca_cola",
+		"name": "코카콜라",
+		"category": "탄산음료",
+		"manufacturer": "코카콜라음료(주)",
+		"manufacturing_locations": {
+			"P1": "경남 양산시 충렬로 269(유산동)",
+			"P2": "광주광역시 북구 양일로 130(양산동)",
+			"P3": "경기도 여주시 세종로 415",
+			"P5": "충남 천안시 동남구 청당산업길 250(해태에이치티비주식회사)"
+		},
+		"origin_country": "미국",
+		"launch_year": 1886,
+		"description": "코카콜라는 세계적으로 가장 유명한 탄산음료 브랜드로, 특유의 단맛과 카라멜 색, 비밀 레시피로 알려진 독특한 맛을 가지고 있다.",
+		"volume": "190ml",
+		"nutrition": {
+			"calories": "80 kcal",
+			"sodium": "6 mg (0%)",
+			"carbohydrate": "20 g (6%)",
+			"sugar": "20 g (20%)",
+			"fat": "0 g (0%)",
+			"trans_fat": "0 g",
+			"saturated_fat": "0 g",
+			"cholesterol": "0 mg (0%)",
+			"protein": "0 g (0%)"
+		},
+		"ingredients": ["정제수", "당시럽", "설탕", "카라멜색소", "인산", "천연향료", "카페인"],
+		"consumption_deadline": "제품 밑면 표시일까지",
+		"key_features": ["카라멜 색소와 비밀 배합 향료 사용", "전 세계 200여 개국에서 판매", "다양한 패키징(캔, 페트병, 글라스병)"],
+		"popular_variants": ["코카콜라 오리지널", "코카콜라 제로 슈거", "코카콜라 라이트"],
+		"notable_campaigns": ["Share a Coke", "Taste the Feeling"],
+		"market_info": {
+			"global_rank": "세계 탄산음료 시장 점유율 1위",
+			"competitors": ["펩시콜라", "닥터페퍼"]
+		},
+		"fun_facts": ["1886년 미국 애틀랜타에서 처음 판매", "처음에는 약용 음료로 개발"],
+		"purchase_info": [
+			{
+				"site": "SSG.COM",
+				"product": "코카콜라 190ml*30입_A",
+				"price": 16071,
+				"original_price": 21600,
+				"discount": "25%",
+				"link": "https://emart.ssg.com/item/itemView.ssg?itemId=1000529473806"
+			},
+			{
+				"site": "쿠팡",
+				"product": "(본사직영) 코카콜라 190ml캔 60입 + 코카콜라 토트백 증정",
+				"price": 43000,
+				"discount_price": 39990,
+				"discount_conditions": "쿠폰 및 결제수단 할인 적용 시",
+				"link": "https://www.coupang.com/vp/products/쿠팡상품링크"
+			},
+			{
+				"site": "네이버 쇼핑",
+				"product": "공식 코카콜라 CAN 190ml 30개입",
+				"price": 17280,
+				"original_price": 23800,
+				"discount": "27%",
+				"link": "https://smartstore.naver.com/네이버상품링크"
+			}
+		]
+	}
+]
