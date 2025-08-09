@@ -27,3 +27,10 @@ pandas
 pymongo
 scikit-learn
 app
+streamlit
+langgraph
+langchain-core==0.3.74
+langchain-upstage==0.7.1
+faiss-cpu
+pydantic>=2.7
+pypdf>=4.2

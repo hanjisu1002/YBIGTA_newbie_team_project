@@ -228,3 +228,4 @@ __pycache__/
 # 기타
 *.log
 *.pem
+*.toml
