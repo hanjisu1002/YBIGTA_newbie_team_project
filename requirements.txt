@@ -31,6 +31,6 @@ streamlit
 langgraph
 langchain-core==0.3.74
 langchain-upstage==0.7.1
-faiss-cpu
+faiss-cpu==1.7.4 ; platform_system == "Linux" and platform_machine == "x86_64"
 pydantic>=2.7
 pypdf>=4.2
