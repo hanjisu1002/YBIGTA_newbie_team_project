@@ -392,3 +392,6 @@ PYTHONPATH=.. python preprocessing/main.py --all -o ../database
 ![preprocess_lotteon](aws/preprocess_lotteon.png)
 ![preprocess_naver](aws/preprocess_naver.png)
 ![github_action](aws/github_action.png)
+
+# 5. AI Agent 과제
+demo link : https://ybigtanewbieteamproject-uegrrafpuwqntnnhbh64wp.streamlit.app/
