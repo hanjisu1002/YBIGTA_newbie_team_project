@@ -11,8 +11,8 @@ class ChatState(TypedDict, total=False):
 
     # --- 메모리 슬롯 ---
     last_intent: Literal["chat", "subject", "review"]
-    last_product: Optional[str]     # 예: "코카콜라", "코카콜라 제로"
-    last_category: Optional[str]    # 예: "콜라", "탄산음료"
+    last_product: Optional[str]
+    last_category: Optional[str]
 
 def initial_state() -> ChatState:
     return {
