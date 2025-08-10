@@ -394,4 +394,4 @@ PYTHONPATH=.. python preprocessing/main.py --all -o ../database
 ![github_action](aws/github_action.png)
 
 # 5. AI Agent 과제
-demo link : https://ybigtanewbieteamproject-uegrrafpuwqntnnhbh64wp.streamlit.app/
+demo link : https://ybigtanewbieteamproject-fcsya7usfybgn2g4qiwhew.streamlit.app/

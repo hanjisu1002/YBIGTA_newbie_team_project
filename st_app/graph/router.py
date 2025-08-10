@@ -127,9 +127,11 @@ def decide_route(state: ChatState) -> ChatState:
     last_product = state.get("last_product")
     last_category = state.get("last_category")
 
-    # LLM 기반 라우팅 (모든 경우에 LLM 사용)
-    if not q:
+    # 일반적인 인사말은 무조건 chat 노드로
+    greeting_keywords = {"안녕", "안녕하세요", "안녕하십니까", "하이", "hi", "hello", "반가워", "반갑습니다"}
+    if q.lower() in greeting_keywords or any(greeting in q.lower() for greeting in greeting_keywords):
         route = "chat"
+        print(f"[DECIDE_ROUTE] Greeting detected: '{q}' -> chat")
     else:
         # 제품명과 카테고리 추출 (LLM 호출 전에)
         prod_now = _extract_product(q)
