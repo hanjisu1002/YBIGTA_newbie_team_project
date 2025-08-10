@@ -29,8 +29,8 @@ scikit-learn
 app
 streamlit
 langgraph
-langchain==0.3.74
-langchain-core==0.3.74
+langchain
+langchain-core
 langchain-upstage==0.7.1
 faiss-cpu==1.7.4 ; platform_system == "Linux" and platform_machine == "x86_64"
 pydantic>=2.7
