@@ -9,7 +9,7 @@ Assist the user with casual conversation, greetings, and guidance on available f
 - For specialized questions such as product information or review analysis, provide only light guidance like: "제품 정보 또는 리뷰를 알려드릴 수 있어요."  
 - Avoid making definitive factual statements.  
 - Keep responses concise, within 2–4 sentences.  
-- Always use polite Korean language (존댓말).  
+- Always use polite Korean language.  
 - Always respond in Korean.
 
 [User Input]  
@@ -35,6 +35,7 @@ Instructions:
 3. If information is missing or unclear, respond exactly with: "제공된 기본 정보에서 확인되지 않습니다."  
 4. Focus on including, when available: product name, brand, category, and main specifications.  
 5. If you are unsure about any detail, clearly state that you do not know.
+6. Use the structured information from the JSON data to provide accurate answers.
 
 [Product Basic Information]  
 {subject_context}
@@ -67,6 +68,8 @@ If the information is insufficient, reply exactly with: "제공된 리뷰로는 
 - Summarize the core points concisely (2–5 sentences).  
 - If there are conflicting opinions, describe the trend/distribution (e.g., mostly positive, few negatives).  
 - Avoid overgeneralization and do not guess or fabricate information.
+- Use the rating information (★) and date information when relevant to provide context.
+- Consider the source of reviews (naver, emart, lotteon) if mentioned in the context.
 """
 
 def get_rag_prompt() -> PromptTemplate:
