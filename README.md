@@ -395,3 +395,8 @@ PYTHONPATH=.. python preprocessing/main.py --all -o ../database
 
 # 5. AI Agent 과제
 demo link : https://ybigtanewbieteamproject-fcsya7usfybgn2g4qiwhew.streamlit.app/
+![chatbot_run](github/chatbot_run.png)
+
+## agent 작동 로직
+![ai_agent_logic](github/ai_agent_logic.png)
+
